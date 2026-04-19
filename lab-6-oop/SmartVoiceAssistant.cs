@@ -21,7 +21,7 @@ namespace lab_6_oop
         public void TellJoke()
         {
             Console.WriteLine($"{AssistantName}: Why don't smart watches get lost?");
-            Console.WriteLine("Because they always follow their GPS! 😄\n");
+            Console.WriteLine("Because they always follow their GPS!\n");
         }
 
         // New feature: Set reminders
