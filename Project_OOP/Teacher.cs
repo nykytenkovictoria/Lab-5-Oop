@@ -14,12 +14,18 @@ namespace DigitalUniversity
         public string Id
         {
             get => _id;
-            set { if (!string.IsNullOrWhiteSpace(value)) _id = value; }
+            set { 
+                if (!string.IsNullOrWhiteSpace(value))
+                    _id = value;
+            }
         }
         public string Name
         {
             get => _name;
-            set { if (!string.IsNullOrWhiteSpace(value)) _name = value; }
+            set { 
+                if (!string.IsNullOrWhiteSpace(value))
+                    _name = value; 
+            }
         }
 
         public string Position
@@ -31,7 +37,10 @@ namespace DigitalUniversity
         public int ExperienceYears
         {
             get => _experienceYears;
-            set { if (value >= 0) _experienceYears = value; }
+            set { 
+                if (value >= 0) 
+                    _experienceYears = value;
+            }
         }
 
         public static int TotalTeachers => _totalTeachers;
