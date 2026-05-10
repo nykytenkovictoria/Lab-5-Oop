@@ -12,11 +12,84 @@ namespace DigitalUniversity
         private List<Classroom> _classrooms = new();
         private List<string> _catalog = new();
 
+        public string Location
+        {
+            get => _location;
+            set { 
+                if (!string.IsNullOrWhiteSpace(value))
+                    _location = value; 
+            }
+        }
+
+        public int Capacity
+        {
+            get => _capacity;
+            set { 
+                if (value > 0) 
+                    _capacity = value; 
+            }
+        }
+
+        public int ClassroomCount => _classrooms.Count;
+        public int BookCount => _catalog.Count;
+
+        public bool IsOpen { get; set; }
+
+        public string FullInfo { get; private set; }
+
+        static Library()
+        {
+            Console.WriteLine("[Library] Статичний конструктор: клас ініціалізовано.");
+        }
+
+        public Library()
+        {
+            _location = "—";
+            _capacity = 0;
+            IsOpen = false;
+            FullInfo = BuildInfo();
+            Console.WriteLine("[Library] Конструктор без параметрів: бібліотеку створено.");
+        }
+
         public Library(string location, int capacity)
         {
             _location = location;
-            _capacity = capacity;
+            _capacity = capacity; 
+            IsOpen = true;
+            FullInfo = BuildInfo();
+            Console.WriteLine($"[Library] Конструктор з параметрами: '{_location}', місць: {_capacity}");
         }
+
+        public Library(string location, int capacity, bool isOpen)
+            : this(location, capacity)
+        {
+            IsOpen = isOpen;
+            FullInfo = BuildInfo();
+            Console.WriteLine($"[Library] Конструктор виклику іншого: відкрита={IsOpen}");
+        }
+
+        public Library(Library other)
+        {
+            _location = other._location + " (копія)";
+            _capacity = other._capacity;
+            IsOpen = other.IsOpen;
+            FullInfo = BuildInfo();
+            Console.WriteLine($"[Library] Конструктор копії: скопійовано '{_location}'");
+        }
+
+        private Library(string location)
+        {
+            _location = location;
+            _capacity = 0;
+            IsOpen = false;
+            FullInfo = BuildInfo();
+            Console.WriteLine($"[Library] Закритий конструктор: резервна бібліотека '{_location}'");
+        }
+
+        public static Library CreateReserve(string location) => new Library(location);
+
+        private string BuildInfo() =>
+            $"Бібліотека: {_location} | Місць: {_capacity} | Відкрита: {IsOpen}";
 
         // Adds a classroom to the campus fund (composition).
         public void AddClassroom(Classroom room) => _classrooms.Add(room);
@@ -47,6 +120,16 @@ namespace DigitalUniversity
             Console.WriteLine($"[Library] Location: {_location}, capacity: {_capacity}");
             Console.WriteLine($"  Books in catalog: {_catalog.Count}");
             Console.WriteLine($"  Classrooms managed: {_classrooms.Count}");
+        }
+
+        public void PrintInfo()
+        {
+            Console.WriteLine($"  Розташування : {_location}");
+            Console.WriteLine($"  Місць        : {_capacity}");
+            Console.WriteLine($"  Відкрита     : {IsOpen}");
+            Console.WriteLine($"  Книг         : {_catalog.Count}");
+            Console.WriteLine($"  Аудиторій    : {_classrooms.Count}");
+            Console.WriteLine($"  FullInfo     : {FullInfo}");
         }
 
         public override string ToString() => $"Library at '{_location}' ({_capacity} seats)";
