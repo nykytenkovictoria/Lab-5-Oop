@@ -9,6 +9,7 @@ namespace DigitalUniversity
         private string _title;
         private int _credits;
         private int _enrolledCount;
+        private int _maxCapacity;
         private static int _totalCourses;
 
         public string Title
@@ -63,6 +64,7 @@ namespace DigitalUniversity
             _title = "Без назви"; 
             _credits = 1;
             _enrolledCount = 0;
+            _maxCapacity = 30;
             IsOnline = false;
             FullInfo = BuildInfo();
             _totalCourses++;
@@ -76,6 +78,7 @@ namespace DigitalUniversity
             _title = title; 
             _credits = credits;
             _enrolledCount = 0;
+            _maxCapacity = 30;
             IsOnline = false;
             FullInfo = BuildInfo();
             _totalCourses++;
@@ -97,6 +100,7 @@ namespace DigitalUniversity
             _courseId = other._courseId + "-copy";
             _title = other._title;
             _credits = other._credits;
+            _maxCapacity = other._maxCapacity;
             IsOnline = other.IsOnline;
             _enrolledCount = 0;
             FullInfo = BuildInfo();
@@ -118,12 +122,28 @@ namespace DigitalUniversity
         public static Course CreateArchived(string id) => new Course(id);
 
         private string BuildInfo() =>
-            $"[{_courseId}] {_title} | Кредити: {_credits} | Онлайн: {IsOnline} | Зараховано: {_enrolledCount}";
+            $"[{_courseId}] {_title} | Кредити: {_credits} | Онлайн: {IsOnline} | Зараховано: {_enrolledCount}/{_maxCapacity}";
+
+        public bool HasAvailableSpots() => _enrolledCount < _maxCapacity;
+
+        public bool IsFull() => _enrolledCount >= _maxCapacity;
+
+        public bool IsActive() => _enrolledCount > 0;
+
+        public bool IsOnlineCourse() => IsOnline;
+
+        public bool IsIntensive() => _credits > 4;
+
 
         /// Enrols a student in this course.
         public void Enroll(Student student)
         {
-            Console.WriteLine($"[Course] '{_title}': student {student.Name} enrolled.");
+            if (IsFull())
+            { Console.WriteLine($"[Course] '{_title}': немає місць для {student.Name}"); return; }
+            _enrolledCount++;
+            FullInfo = BuildInfo();
+            Console.WriteLine($"[Course] '{_title}':" +
+                $" зараховано {student.Name}. Місць зайнято: {_enrolledCount}/{_maxCapacity}");
         }
 
         /// Returns a list of available materials (stub).
@@ -136,6 +156,17 @@ namespace DigitalUniversity
         public void GetInfo()
         {
             Console.WriteLine($"[Course] ID={_courseId}, Title='{_title}', Credits={_credits}");
+        }
+
+        public void PrintEnrollmentStatus()
+        {
+            Console.WriteLine($"[Course] '{_title}' — стан запису:");
+            Console.WriteLine($"  Зараховано    : {_enrolledCount}/{_maxCapacity}");
+            Console.WriteLine($"  Є місця       : {HasAvailableSpots()}");
+            Console.WriteLine($"  Заповнений    : {IsFull()}");
+            Console.WriteLine($"  Активний      : {IsActive()}");
+            Console.WriteLine($"  Онлайн        : {IsOnlineCourse()}");
+            Console.WriteLine($"  Інтенсивний   : {IsIntensive()}");
         }
 
         public void PrintInfo()

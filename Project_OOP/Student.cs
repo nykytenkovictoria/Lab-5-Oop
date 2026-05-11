@@ -13,6 +13,7 @@ namespace DigitalUniversity
         private string _group;
         private string _course;
         private double _gpa;
+        private int _missedClasses;
         private static int _totalStudents;
 
         public string Id
@@ -26,10 +27,21 @@ namespace DigitalUniversity
         public string Name
         {
             get => _name;
-            set { 
+            set
+            {
                 if (!string.IsNullOrWhiteSpace(value))
-                    _name = value; 
+                    _name = value;
             }
+        }
+
+        public int MissedClasses 
+        { 
+            get => _missedClasses; 
+            set 
+            { 
+                if (value >= 0)
+                    _missedClasses = value; 
+            } 
         }
 
         public string Group
@@ -56,6 +68,17 @@ namespace DigitalUniversity
         public string FullInfo { get; private set; }
 
 
+        public bool IsExcellentStudent() => _gpa >= 90.0;
+
+        public bool IsAtRisk() => _gpa < 60.0 && IsActive;
+
+        public bool HasDebt() => _missedClasses > 20;
+
+        public bool IsEligibleForScholarship() => _gpa >= 75.0 && !HasDebt() && IsActive;
+
+        public bool IsEnrolledAndActive() => IsActive && !string.IsNullOrEmpty(_group) && _group != "—";
+
+
         // 1. Статичний конструктор
         static Student()
         {
@@ -71,6 +94,7 @@ namespace DigitalUniversity
             _group = "—"; 
             _course = "—"; 
             _gpa = 0.0;
+            _missedClasses = 0;
             IsActive = false;
             FullInfo = BuildInfo();
             _totalStudents++;
@@ -84,6 +108,7 @@ namespace DigitalUniversity
             _group = group; 
             _course = course; 
             _gpa = 0.0;
+            _missedClasses = 0;
             IsActive = true;
             FullInfo = BuildInfo();
             _totalStudents++;
@@ -91,10 +116,11 @@ namespace DigitalUniversity
         }
 
         // 4. Конструктор що викликає інший конструктор
-        public Student(string id, string name, string group, string course, double gpa)
+        public Student(string id, string name, string group, string course, double gpa, int missedClasses)
             : this(id, name, group, course)
         {
             _gpa = gpa;
+            _missedClasses = missedClasses;
             FullInfo = BuildInfo();
             Console.WriteLine($"[Student] Конструктор виклику іншого: GPA = {_gpa}");
         }
@@ -107,6 +133,7 @@ namespace DigitalUniversity
             _group = other._group;
             _course = other._course;
             _gpa = other._gpa;
+            _missedClasses = other._missedClasses;
             IsActive = other.IsActive;
             FullInfo = BuildInfo();
             _totalStudents++;
@@ -121,6 +148,7 @@ namespace DigitalUniversity
             _name = "System";
             _group = "—";
             _course = "—";
+            _missedClasses = 0;
             IsActive = false;
             FullInfo = BuildInfo();
             Console.WriteLine($"[Student] Закритий конструктор: службовий [{_id}]");
@@ -135,19 +163,37 @@ namespace DigitalUniversity
         // Opens the student's personal electronic cabinet.
         public void ViewCabinet()
         {
-            Console.WriteLine($"[Student] {_name} opens electronic cabinet. Group: {_group}, Course: {_course}");
+            Console.WriteLine($"[Student] {_name} " +
+                $"opens electronic cabinet. Group: {_group}, Course: {_course}");
+            Console.WriteLine($"  Група: {_group} " +
+                $"| Курс: {_course} | GPA: {_gpa}");
+            Console.WriteLine($"  Статус: {(IsExcellentStudent() ? 
+                "Відмінник" : IsAtRisk() ? 
+                "Під загрозою відрахування" 
+                : "Звичайний студент")}");
         }
 
         // Submits a report or assignment.
         public void SubmitReport(OnlineReport report)
         {
             Console.WriteLine($"[Student] {_name} submits report: {report.Type}");
+            report.Submit();
         }
 
         // Views the current class schedule
         public void ViewSchedule()
         {
             Console.WriteLine($"[Student] {_name} views schedule for group {_group}");
+        }
+
+        public void CheckStatus()
+        {
+            Console.WriteLine($"[Student] Статус {_name}:");
+            Console.WriteLine($"  Відмінник          : {IsExcellentStudent()}");
+            Console.WriteLine($"  Під загрозою       : {IsAtRisk()}");
+            Console.WriteLine($"  Є заборгованість   : {HasDebt()}");
+            Console.WriteLine($"  Право на стипендію : {IsEligibleForScholarship()}");
+            Console.WriteLine($"  Активний/зарахований: {IsEnrolledAndActive()}");
         }
 
         public void PrintInfo()

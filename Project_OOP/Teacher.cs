@@ -9,6 +9,7 @@ namespace DigitalUniversity
         private string _name;
         private string _position;
         private int _experienceYears;
+        private int _coursesCount;
         private static int _totalTeachers;
 
         public string Id
@@ -116,6 +117,19 @@ namespace DigitalUniversity
         }
 
         public static Teacher CreateGuest(string id) => new Teacher(id);
+        public bool IsSenior() => _experienceYears >= 10;
+
+        public bool IsProfessor() => _position.Contains("Проф", StringComparison.OrdinalIgnoreCase);
+
+        /// Чи перевантажений викладач (більше 4 курсів)
+        public bool IsOverloaded() => _coursesCount > 4;
+
+        /// Чи може брати нові курси (не перевантажений)
+        public bool CanTakeMoreCourses() => _coursesCount < 5;
+
+        /// Чи належить до кафедри
+        public bool BelongsToDepartment(string deptName) =>
+            Department.Equals(deptName, StringComparison.OrdinalIgnoreCase);
 
         private string BuildInfo() =>
             $"[{_id}] {_name} | Посада: {_position} | Досвід: {_experienceYears} р. | Кафедра: {Department}";
@@ -124,12 +138,18 @@ namespace DigitalUniversity
         public void ViewCabinet()
         {
             Console.WriteLine($"[Teacher] {_name} ({_position}) opens electronic cabinet.");
+            Console.WriteLine($"  Посада: {_position} | Досвід: {_experienceYears} р. | Кафедра: {Department}");
+            Console.WriteLine($"  Рівень: {(IsProfessor() ? "Професор" : IsSenior() ?
+                "Старший викладач" : "Молодший викладач")}");
         }
 
         // Grades a student for a given course.
         public void GradeStudent(Student student, Course course, int grade)
         {
-            Console.WriteLine($"[Teacher] {_name} grades {student.Name} in '{course.Title}': {grade}");
+            student.GPA = grade;
+            Console.WriteLine($"[Teacher] {_name} виставляє {student.Name} оцінку {grade} з '{course.Title}'");
+            if (student.IsExcellentStudent())
+                Console.WriteLine($"{student.Name} отримав статус відмінника!");
         }
 
         // Posts educational material to a course.
@@ -143,6 +163,30 @@ namespace DigitalUniversity
         {
             Console.WriteLine($"[Teacher] {_name} submits report: {report.Type}");
             report.Submit();
+        }
+
+
+        public void AssignCourse(Course course)
+        {
+            if (!CanTakeMoreCourses())
+            {
+                Console.WriteLine($"[Teacher] {_name}:" +
+                $" перевантажений, не може взяти '{course.Title}'"); return;
+            }
+            _coursesCount++;
+            FullInfo = BuildInfo();
+            Console.WriteLine($"[Teacher] {_name}" +
+                $" призначений на курс '{course.Title}' (курсів: {_coursesCount})");
+        }
+
+
+        public void CheckStatus()
+        {
+            Console.WriteLine($"[Teacher] Статус {_name}:");
+            Console.WriteLine($"  Старший викладач   : {IsSenior()}");
+            Console.WriteLine($"  Професор           : {IsProfessor()}");
+            Console.WriteLine($"  Перевантажений     : {IsOverloaded()}");
+            Console.WriteLine($"  Може брати курси   : {CanTakeMoreCourses()}");
         }
 
         public void PrintInfo()
