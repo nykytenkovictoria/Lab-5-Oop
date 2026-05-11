@@ -11,6 +11,7 @@ namespace DigitalUniversity
         private int _capacity;
         private List<Classroom> _classrooms = new();
         private List<string> _catalog = new();
+        private List<string> _borrowedBooks = new();
 
         public string Location
         {
@@ -88,6 +89,18 @@ namespace DigitalUniversity
 
         public static Library CreateReserve(string location) => new Library(location);
 
+        public bool IsLibraryOpen() => IsOpen;
+
+        /// Чи є книга в каталозі
+        public bool HasBook(string title) =>
+            _catalog.Exists(b => b.Contains(title, StringComparison.OrdinalIgnoreCase));
+
+        /// Чи бібліотека переповнена (більше 80% аудиторій зайнято)
+        public bool IsNearCapacity() => _classrooms.Count > 0 && _classrooms.Count >= _capacity * 0.8;
+
+        /// Чи є вільні аудиторії
+        public bool HasFreeClassrooms() => _classrooms.Exists(r => !r.IsBooked);
+
         private string BuildInfo() =>
             $"Бібліотека: {_location} | Місць: {_capacity} | Відкрита: {IsOpen}";
 
@@ -102,16 +115,17 @@ namespace DigitalUniversity
         {
             Console.WriteLine($"[Library] Searching catalog for '{keyword}'...");
             var found = _catalog.FindAll(b => b.Contains(keyword, StringComparison.OrdinalIgnoreCase));
-            if (found.Count == 0)
-                Console.WriteLine("  No results found.");
-            else
-                found.ForEach(b => Console.WriteLine($"  Found: {b}"));
+            if (found.Count == 0) Console.WriteLine("  Нічого не знайдено.");
+            else found.ForEach(b => Console.WriteLine($"  Знайдено: {b}"));
         }
 
         // Records a book borrowing event.
         public void BorrowBook(Student student, string title)
         {
-            Console.WriteLine($"[Library] {student.Name} borrows '{title}' from {_location} library.");
+            if (!HasBook(title))
+            { Console.WriteLine($"[Library] Книга '{title}' відсутня в каталозі."); return; }
+            _borrowedBooks.Add($"{student.Name}:{title}");
+            Console.WriteLine($"[Library] {student.Name} отримує '{title}'");
         }
 
         // Prints a summary of the library catalog and rooms.
@@ -129,6 +143,7 @@ namespace DigitalUniversity
             Console.WriteLine($"  Відкрита     : {IsOpen}");
             Console.WriteLine($"  Книг         : {_catalog.Count}");
             Console.WriteLine($"  Аудиторій    : {_classrooms.Count}");
+            Console.WriteLine($"  Видано книг  : {_borrowedBooks.Count}");
             Console.WriteLine($"  FullInfo     : {FullInfo}");
         }
 

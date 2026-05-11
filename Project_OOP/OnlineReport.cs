@@ -96,13 +96,21 @@ namespace DigitalUniversity
 
         public static OnlineReport CreateSystem(string id) => new OnlineReport(id);
 
+        public bool IsPending() => !_submitted && !_archived;
+ 
+        /// Чи звіт вже закритий (поданий та архівований)
+        public bool IsClosed() => _submitted && _archived;
+ 
+        /// Чи звіт має автора
+        public bool HasAuthor() => !string.IsNullOrEmpty(Author) && Author != "—";
         private string BuildInfo() =>
             $"[{_reportId}] {_type} | Автор: {Author} | Подано: {_submitted} | Архів: {_archived}";
 
         // Generates report content (stub — logic to be implemented in later versions)
         public void Generate()
         {
-            Console.WriteLine($"[OnlineReport] Generating report [{_reportId}] of type '{_type}'...");
+            Console.WriteLine($"[OnlineReport] Генерація звіту [{_reportId}] '{_type}'");
+            Console.WriteLine($"  Автор: {Author} | Стан: {(IsPending() ? "Очікує подачі" : "Оброблено")}");
         }
 
         // Marks the report as submitted.
@@ -127,6 +135,8 @@ namespace DigitalUniversity
             Console.WriteLine($"  Подано       : {_submitted}");
             Console.WriteLine($"  Архівовано   : {_archived}");
             Console.WriteLine($"  FullInfo     : {FullInfo}");
+            Console.WriteLine($"  Очікує       : {IsPending()}");
+            Console.WriteLine($"  Закритий     : {IsClosed()}");
             Console.WriteLine($"  Всього звітів: {TotalReports}");
         }
 

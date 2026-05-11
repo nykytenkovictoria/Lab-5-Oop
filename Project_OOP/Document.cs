@@ -96,6 +96,14 @@ namespace DigitalUniversity
 
         public static Document CreateTemplate(string id) => new Document(id);
 
+        public bool IsReadyToIssue() => _signed && !_archived;
+
+        /// Чи документ потребує підпису
+        public bool NeedsSignature() => !_signed && !_archived;
+
+        /// Чи документ в архіві
+        public bool IsInArchive() => _archived;
+
         private string BuildInfo() =>
             $"[{_docId}] {_docType} | Автор: {CreatedBy} | Підписано: {_signed} | Архів: {_archived}";
 
@@ -108,15 +116,18 @@ namespace DigitalUniversity
         // Signs the document digitally.
         public void Sign(string signerName)
         {
-            _signed = true;
-            Console.WriteLine($"[Document] [{_docId}] signed by '{signerName}'");
+            if (_archived) { Console.WriteLine($"[Document] [{_docId}] вже архівований, підпис неможливий."); return; }
+            _signed = true; FullInfo = BuildInfo();
+            Console.WriteLine($"[Document] [{_docId}] підписано: '{signerName}'");
         }
+
 
         /// Archives the document.
         public void Archive()
         {
-            _archived = true;
-            Console.WriteLine($"[Document] [{_docId}] archived. (Signed: {_signed})");
+            if (!_signed) Console.WriteLine($"[Document] Увага: [{_docId}] архівується без підпису!");
+            _archived = true; FullInfo = BuildInfo();
+            Console.WriteLine($"[Document] [{_docId}] архівовано.");
         }
 
 
@@ -127,6 +138,7 @@ namespace DigitalUniversity
             Console.WriteLine($"  Автор        : {CreatedBy}");
             Console.WriteLine($"  Підписано    : {_signed}");
             Console.WriteLine($"  Архівовано   : {_archived}");
+            Console.WriteLine($"  Готовий      : {IsReadyToIssue()}");
             Console.WriteLine($"  FullInfo     : {FullInfo}");
             Console.WriteLine($"  Всього докум.: {TotalDocs}");
         }
