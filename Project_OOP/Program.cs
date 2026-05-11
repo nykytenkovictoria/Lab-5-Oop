@@ -249,7 +249,7 @@ class Program
         Console.WriteLine("Курс         : 1");
         Console.WriteLine("Група        : IPZ-12");
         Console.WriteLine("Варіант      : Цифровий університет");
-        Console.WriteLine("Версія       : 1.0");
+        Console.WriteLine("Версія       : 3.0");
         Console.WriteLine();
     }
 
