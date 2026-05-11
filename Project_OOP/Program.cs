@@ -18,7 +18,7 @@ class Program
 
         var s1 = new Student();                                              // без параметрів
         var s2 = new Student("S-001", "Коваленко Дмитро", "КН-21", "2-й"); // з параметрами
-        var s3 = new Student("S-002", "Мельник Оксана", "КН-21", "2-й", 88.5); // виклик іншого
+        var s3 = new Student("S-002", "Мельник Оксана", "КН-21", "2-й", 88.5, 0); // виклик іншого
         var s4 = new Student(s2);                                            // копія
         var s5 = Student.CreateSystem("S-SYS");                              // закритий
         s2.GPA = 92.0; s2.IsActive = true;                                   // аксесори запис
@@ -133,6 +133,111 @@ class Program
             $"Archived={rep2.IsArchived}," +
             $" TotalReports={OnlineReport.TotalReports}");
         rep2.PrintInfo();
+
+        // ── Student predicates ───────────────────────────────────
+        Console.WriteLine("\n=== Student: предикатні функції ===");
+        s2.GPA = 92.0; s2.MissedClasses = 0;
+        s3.GPA = 55.0; s3.MissedClasses = 25;
+        Console.WriteLine($"  [{s2.Name}] GPA={s2.GPA}");
+        Console.WriteLine($"  IsExcellentStudent : {s2.IsExcellentStudent()}");
+        Console.WriteLine($"  IsAtRisk           : {s2.IsAtRisk()}");
+        Console.WriteLine($"  HasDebt            : {s2.HasDebt()}");
+        Console.WriteLine($"  IsEligibleForScholarship: {s2.IsEligibleForScholarship()}");
+        Console.WriteLine($"  IsEnrolledAndActive: {s2.IsEnrolledAndActive()}");
+        Console.WriteLine($"  [{s3.Name}] GPA={s3.GPA}, Пропуски={s3.MissedClasses}");
+        Console.WriteLine($"  IsExcellentStudent : {s3.IsExcellentStudent()}");
+        Console.WriteLine($"  IsAtRisk           : {s3.IsAtRisk()}");
+        Console.WriteLine($"  HasDebt            : {s3.HasDebt()}");
+        Console.WriteLine($"  IsEligibleForScholarship: {s3.IsEligibleForScholarship()}");
+
+        // ── Teacher predicates ───────────────────────────────────
+        Console.WriteLine("\n=== Teacher: предикатні функції ===");
+        Console.WriteLine($"  [{t2.Name}] Досвід={t2.ExperienceYears}, Посада={t2.Position}");
+        Console.WriteLine($"  IsSenior           : {t2.IsSenior()}");
+        Console.WriteLine($"  IsProfessor        : {t2.IsProfessor()}");
+        Console.WriteLine($"  IsOverloaded       : {t2.IsOverloaded()}");
+        Console.WriteLine($"  CanTakeMoreCourses : {t2.CanTakeMoreCourses()}");
+        Console.WriteLine($"  BelongsToDept КН   : {t2.BelongsToDepartment("Кафедра КН")}");
+        t2.AssignCourse(c2); t2.AssignCourse(c3);
+        Console.WriteLine($"  [{t3.Name}] Посада={t3.Position}");
+        Console.WriteLine($"  IsProfessor        : {t3.IsProfessor()}");
+        Console.WriteLine($"  IsSenior           : {t3.IsSenior()}");
+
+        // ── Course predicates ────────────────────────────────────
+        Console.WriteLine("\n=== Course: предикатні функції ===");
+        Console.WriteLine($"  [{c2.Title}] Зараховано={c2.EnrolledCount}");
+        Console.WriteLine($"  IsActive           : {c2.IsActive()}");
+        Console.WriteLine($"  HasAvailableSpots  : {c2.HasAvailableSpots()}");
+        Console.WriteLine($"  IsFull             : {c2.IsFull()}");
+        Console.WriteLine($"  IsOnlineCourse     : {c2.IsOnlineCourse()}");
+        Console.WriteLine($"  IsIntensive        : {c2.IsIntensive()}");
+        Console.WriteLine($"  [{c3.Title}] Онлайн={c3.IsOnline}");
+        Console.WriteLine($"  IsOnlineCourse     : {c3.IsOnlineCourse()}");
+        c2.PrintEnrollmentStatus();
+
+        // ── Department predicates ────────────────────────────────
+        Console.WriteLine("\n=== Department: предикатні функції ===");
+        Console.WriteLine($"  [{d2.Name}]");
+        Console.WriteLine($"  IsLarge            : {d2.IsLarge()}");
+        Console.WriteLine($"  IsActive           : {d2.IsActive()}");
+        Console.WriteLine($"  HasSufficientStaff : {d2.HasSufficientStaff()}");
+        Console.WriteLine($"  HasCourse CS101    : {d2.HasCourse("CS101")}");
+        Console.WriteLine($"  HasCourse CS999    : {d2.HasCourse("CS999")}");
+        d2.ListExcellentStudents();
+        d2.ListAtRiskStudents();
+
+        // ── Library + Classroom predicates ──────────────────────
+        Console.WriteLine("\n=== Library + Classroom: предикатні функції ===");
+        Console.WriteLine($"  IsLibraryOpen      : {l2.IsLibraryOpen()}");
+        Console.WriteLine($"  HasBook 'Design'   : {l2.HasBook("Design Patterns")}");
+        Console.WriteLine($"  HasBook 'Java'     : {l2.HasBook("Java")}");
+        Console.WriteLine($"  HasFreeClassrooms  : {l2.HasFreeClassrooms()}");
+        Console.WriteLine($"  [{r2.RoomNumber}] IsBooked={r2.IsBooked}");
+        Console.WriteLine($"  IsFree             : {r2.IsFree()}");
+        Console.WriteLine($"  IsLarge            : {r2.IsLarge()}");
+        Console.WriteLine($"  CanFitGroup(25)    : {r2.CanFitGroup(25)}");
+        Console.WriteLine($"  [{r3.RoomNumber}] Місць={r3.Capacity}");
+        Console.WriteLine($"  IsLarge            : {r3.IsLarge()}");
+        Console.WriteLine($"  CanFitGroup(55)    : {r3.CanFitGroup(55)}");
+
+        // ── Document predicates ──────────────────────────────────
+        Console.WriteLine("\n=== Document: предикатні функції ===");
+        Console.WriteLine($"  [{doc2.DocId}] Підписано={doc2.IsSigned}");
+        Console.WriteLine($"  NeedsSignature     : {doc2.NeedsSignature()}");
+        Console.WriteLine($"  IsReadyToIssue     : {doc2.IsReadyToIssue()}");
+        Console.WriteLine($"  IsInArchive        : {doc2.IsInArchive()}");
+        doc2.Sign("Доц. Бондаренко");
+        Console.WriteLine($"  Після підпису:");
+        Console.WriteLine($"  NeedsSignature     : {doc2.NeedsSignature()}");
+        Console.WriteLine($"  IsReadyToIssue     : {doc2.IsReadyToIssue()}");
+        doc2.Archive();
+        Console.WriteLine($"  Після архівування:");
+        Console.WriteLine($"  IsInArchive        : {doc2.IsInArchive()}");
+
+        // ── Decanat predicates ───────────────────────────────────
+        Console.WriteLine("\n=== Decanat: предикатні функції ===");
+        Console.WriteLine($"  [{dec2.Faculty}]");
+        Console.WriteLine($"  IsOperational      : {dec2.IsOperational()}");
+        Console.WriteLine($"  IsOverloaded       : {dec2.IsOverloaded()}");
+        Console.WriteLine($"  HasPendingRequests : {dec2.HasPendingRequests()}");
+        Console.WriteLine($"  HasStudent S-001   : {dec2.HasStudent("S-001")}");
+        Console.WriteLine($"  HasStudent S-999   : {dec2.HasStudent("S-999")}");
+        dec2.GenerateReport();
+
+        // ── OnlineReport predicates ──────────────────────────────
+        Console.WriteLine("\n=== OnlineReport: предикатні функції ===");
+        var repNew = new OnlineReport("RPT-NEW", "Квартальний звіт", "Петренко О.");
+        Console.WriteLine($"  [{repNew.ReportId}]");
+        Console.WriteLine($"  IsPending          : {repNew.IsPending()}");
+        Console.WriteLine($"  IsClosed           : {repNew.IsClosed()}");
+        Console.WriteLine($"  HasAuthor          : {repNew.HasAuthor()}");
+        repNew.Generate();
+        repNew.Submit();
+        Console.WriteLine($"  Після подачі:");
+        Console.WriteLine($"  IsPending          : {repNew.IsPending()}");
+        repNew.Archive();
+        Console.WriteLine($"  Після архівування:");
+        Console.WriteLine($"  IsClosed           : {repNew.IsClosed()}");
 
         Console.WriteLine("----------------------------------------------");
         Console.WriteLine(">>> Фініш імітації <<<");
