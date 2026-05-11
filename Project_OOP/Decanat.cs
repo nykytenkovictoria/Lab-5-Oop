@@ -88,6 +88,18 @@ namespace DigitalUniversity
 
         public static Decanat CreateSystem(string faculty) => new Decanat(faculty);
 
+
+        /// Чи є необроблені запити (документів менше, ніж студентів × 2)
+        public bool HasPendingRequests() => _documents.Count < _students.Count * 2;
+
+        /// Чи деканат завантажений (більше 100 студентів)
+        public bool IsOverloaded() => _students.Count > 100;
+        public bool IsOperational() => IsActive && _students.Count > 0;
+
+        /// Чи є студент у деканаті
+        public bool HasStudent(string studentId) =>
+            _students.Exists(s => s.Id.Equals(studentId, StringComparison.OrdinalIgnoreCase));
+
         private string BuildInfo() =>
             $"Деканат: {_faculty} | Керівник: {_headName} | Активний: {IsActive}";
 
@@ -107,14 +119,19 @@ namespace DigitalUniversity
         {
             Console.WriteLine($"[Decanat] Faculty '{_faculty}' manages {_students.Count} student(s):");
             foreach (var s in _students)
-                Console.WriteLine($"  - {s}");
+                Console.WriteLine($"  {s.Name} | GPA={s.GPA} | " +
+                    $"{(s.IsEligibleForScholarship() ? "Стипендія" : "")}");
         }
 
         // Generates a summary report.
         public void GenerateReport()
         {
-            Console.WriteLine($"[Decanat] Generating report for faculty '{_faculty}'. Head: {_headName}");
-            Console.WriteLine($"  Total students: {_students.Count}, Documents on file: {_documents.Count}");
+            Console.WriteLine($"[Decanat] Звіт факультету '{_faculty}'. Керівник: {_headName}");
+            Console.WriteLine($"  Студентів: {_students.Count} | Документів: {_documents.Count}");
+            Console.WriteLine($"  Операційний: {IsOperational()} | Перевантажений: {IsOverloaded()}");
+            int eligible = _students.FindAll(s => s.IsEligibleForScholarship()).Count;
+            int atRisk = _students.FindAll(s => s.IsAtRisk()).Count;
+            Console.WriteLine($"  Право на стипендію: {eligible} | Під загрозою: {atRisk}");
         }
 
         public void PrintInfo()

@@ -8,6 +8,7 @@ namespace DigitalUniversity
         private string _roomNumber;
         private int _capacity;
         private bool _isBooked;
+        private string _bookedBy;
         private static int _totalRooms;
 
         public string RoomNumber
@@ -95,6 +96,13 @@ namespace DigitalUniversity
 
         public static Classroom CreateReserve(string room) => new Classroom(room);
 
+        public bool IsFree() => !_isBooked;
+
+        public bool IsLarge() => _capacity > 50;
+
+        /// Чи підходить для групи певного розміру
+        public bool CanFitGroup(int groupSize) => _capacity >= groupSize && !_isBooked;
+        
         private string BuildInfo() =>
             $"Ауд.{_roomNumber} | Місць: {_capacity} | Корпус: {Building} | Зайнята: {_isBooked}";
 
@@ -102,18 +110,25 @@ namespace DigitalUniversity
         public void Book(Teacher teacher, Course course)
         {
             if (_isBooked)
-            {
-                Console.WriteLine($"[Classroom] Room {_roomNumber} is already booked.");
-                return;
-            }
+            { Console.WriteLine($"[Classroom] Ауд.{_roomNumber} вже зайнята ({_bookedBy})."); return; }
             _isBooked = true;
-            Console.WriteLine($"[Classroom] Room {_roomNumber} booked by {teacher.Name} for '{course.Title}'");
+            _bookedBy = $"{teacher.Name} / {course.Title}";
+            FullInfo = BuildInfo();
+            Console.WriteLine($"[Classroom] Ауд.{_roomNumber} заброньована: {_bookedBy}");
+        }
+
+        public void Release()
+        {
+            _isBooked = false; _bookedBy = "";
+            FullInfo = BuildInfo();
+            Console.WriteLine($"[Classroom] Ауд.{_roomNumber} звільнена.");
         }
 
         /// Returns the room's current schedule (stub).
         public void GetSchedule()
         {
-            Console.WriteLine($"[Classroom] Schedule for room {_roomNumber}: capacity={_capacity}, booked={_isBooked}");
+            Console.WriteLine($"[Classroom] Ауд.{_roomNumber}: місць={_capacity}, зайнята={_isBooked}");
+            if (_isBooked) Console.WriteLine($"  Ким зайнята: {_bookedBy}");
         }
 
         /// Displays room information.

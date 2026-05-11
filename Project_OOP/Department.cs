@@ -94,6 +94,18 @@ namespace DigitalUniversity
 
         public static Department CreateSystem(string name) => new Department(name);
 
+
+        public bool IsLarge() => _students.Count > 50;
+
+        /// Чи достатньо викладачів (хоча б 1 на 20 студентів)
+        public bool HasSufficientStaff() => _teachers.Count > 0 
+            && _students.Count / (_teachers.Count * 20.0) <= 1;
+        public bool IsActive() => _courses.Count > 0 && _teachers.Count > 0 
+            && _students.Count > 0;
+
+        /// Чи є конкретний курс на кафедрі
+        public bool HasCourse(string courseId) =>
+            _courses.Exists(c => c.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase));
         private string BuildInfo() =>
             $"Кафедра: {_name} | Декан: {_dean} | Факультет: {Faculty}";
 
@@ -105,14 +117,35 @@ namespace DigitalUniversity
         /// Prints general department information.
         public void GetInfo()
         {
-            Console.WriteLine($"[Department] '{_name}', Dean: {_dean}");
-            Console.WriteLine($"  Courses: {_courses.Count}, Teachers: {_teachers.Count}, Students: {_students.Count}");
+            Console.WriteLine($"[Department] {FullInfo}");
+            Console.WriteLine($"  Курсів: {_courses.Count} | Викладачів: {_teachers.Count} | Студентів: {_students.Count}");
+            Console.WriteLine($"  Активна: {IsActive()} | Достатньо кадрів: {HasSufficientStaff()}");
         }
 
         /// Displays the current schedule (stub).
         public void ManageSchedule()
         {
-            Console.WriteLine($"[Department] '{_name}': managing schedule for {_courses.Count} course(s)...");
+            Console.WriteLine($"[Department] '{_name}': формування розкладу...");
+            foreach (var c in _courses)
+                Console.WriteLine($"Курс '{c.Title}' ({(c.IsOnlineCourse() ? "онлайн" : "очно")})");
+        }
+
+        public void ListExcellentStudents()
+        {
+            Console.WriteLine($"[Department] Відмінники кафедри '{_name}':");
+            var found = false;
+            foreach (var s in _students)
+                if (s.IsExcellentStudent()) { Console.WriteLine($"{s.Name} (GPA={s.GPA})"); found = true; }
+            if (!found) Console.WriteLine("  (немає відмінників)");
+        }
+
+        public void ListAtRiskStudents()
+        {
+            Console.WriteLine($"[Department] Студенти під загрозою відрахування:");
+            var found = false;
+            foreach (var s in _students)
+                if (s.IsAtRisk()) { Console.WriteLine($"{s.Name} (GPA={s.GPA})"); found = true; }
+            if (!found) Console.WriteLine("  (немає таких студентів)");
         }
 
         public void PrintInfo()
