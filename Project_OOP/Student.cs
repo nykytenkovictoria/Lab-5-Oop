@@ -254,5 +254,7 @@ namespace DigitalUniversity
         public static bool operator <(Student a, Student b) => a._gpa < b._gpa;
         public static bool operator >=(Student a, Student b) => a._gpa >= b._gpa;
         public static bool operator <=(Student a, Student b) => a._gpa <= b._gpa;
+
+        public override bool Equals(object? obj) => obj is Student s && _gpa == s._gpa;
     }
 }

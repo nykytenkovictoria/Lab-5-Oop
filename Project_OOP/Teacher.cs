@@ -15,7 +15,8 @@ namespace DigitalUniversity
         public string Id
         {
             get => _id;
-            set { 
+            set
+            {
                 if (!string.IsNullOrWhiteSpace(value))
                     _id = value;
             }
@@ -23,9 +24,10 @@ namespace DigitalUniversity
         public string Name
         {
             get => _name;
-            set { 
+            set
+            {
                 if (!string.IsNullOrWhiteSpace(value))
-                    _name = value; 
+                    _name = value;
             }
         }
 
@@ -38,8 +40,9 @@ namespace DigitalUniversity
         public int ExperienceYears
         {
             get => _experienceYears;
-            set { 
-                if (value >= 0) 
+            set
+            {
+                if (value >= 0)
                     _experienceYears = value;
             }
         }
@@ -60,10 +63,10 @@ namespace DigitalUniversity
         // 2. Конструктор без параметрів
         public Teacher()
         {
-            _id = "T-000"; 
-            _name = "Невідомий"; 
+            _id = "T-000";
+            _name = "Невідомий";
             _position = "—";
-            _experienceYears = 0; 
+            _experienceYears = 0;
             Department = "—";
             FullInfo = BuildInfo();
             _totalTeachers++;
@@ -73,10 +76,10 @@ namespace DigitalUniversity
         // 3. Конструктор з параметрами
         public Teacher(string id, string name, string position)
         {
-            _id = id; 
+            _id = id;
             _name = name;
             _position = position;
-            _experienceYears = 0; 
+            _experienceYears = 0;
             Department = "—";
             FullInfo = BuildInfo();
             _totalTeachers++;
@@ -201,5 +204,23 @@ namespace DigitalUniversity
         }
 
         public override string ToString() => $"Teacher [{_id}] {_name}, {_position}";
+
+        public static Teacher operator ++(Teacher t)
+        {
+            t._experienceYears++;
+            t.FullInfo = t.BuildInfo();
+            Console.WriteLine($"[Teacher op++] {t.Name}: досвід = {t.ExperienceYears} р.");
+            return t;
+        }
+
+        // Оператори порівняння: порівнюємо по досвіду
+        public static bool operator ==(Teacher a, Teacher b) => a._experienceYears == b._experienceYears;
+        public static bool operator !=(Teacher a, Teacher b) => a._experienceYears != b._experienceYears;
+        public static bool operator >(Teacher a, Teacher b) => a._experienceYears > b._experienceYears;
+        public static bool operator <(Teacher a, Teacher b) => a._experienceYears < b._experienceYears;
+        public static bool operator >=(Teacher a, Teacher b) => a._experienceYears >= b._experienceYears;
+        public static bool operator <=(Teacher a, Teacher b) => a._experienceYears <= b._experienceYears;
+
+        public override bool Equals(object? obj) => obj is Teacher t && _experienceYears == t._experienceYears;
     }
 }
