@@ -182,5 +182,46 @@ namespace DigitalUniversity
 
 
         public override string ToString() => $"Course [{_courseId}] '{_title}' ({_credits} cr.)";
+
+        // Унарний ++  : підвищити credits на 1 
+        public static Course operator ++(Course c)
+        {
+            c._credits += 1;
+            Console.WriteLine($"[Course op++] {c.Title}: credits підвищено до {c._credits}");
+            return c;
+        }
+
+        // Унарний --  : знизити credits на 1 
+        public static Course operator --(Course c)
+        {
+            c._credits += 1;
+            Console.WriteLine($"[Course op--] {c.Title}: credits знижено до {c._credits}");
+            return c;
+        }
+
+        public static bool operator true(Course c) => c._credits > 0;
+        public static bool operator false(Course c) => c._credits <= 0;
+
+        // Бінарний +  : об'єднати два курси → новий із сумою кредитів
+        public static Course operator +(Course a, Course b)
+        {
+            var result = new Course(
+                a._courseId + "+" + b._courseId,
+                a._title + " + " + b._title,
+                a._credits + b._credits
+            );
+            Console.WriteLine($"[Course op+] Об'єднано курси: '{result.Title}', кредитів={result.Credits}");
+            return result;
+        }
+
+        // Оператори порівняння: порівнюємо по кількості кредитів
+        public static bool operator ==(Course a, Course b) => a._credits == b._credits;
+        public static bool operator !=(Course a, Course b) => a._credits != b._credits;
+        public static bool operator >(Course a, Course b) => a._credits > b._credits;
+        public static bool operator <(Course a, Course b) => a._credits < b._credits;
+        public static bool operator >=(Course a, Course b) => a._credits >= b._credits;
+        public static bool operator <=(Course a, Course b) => a._credits <= b._credits;
+
+        public override bool Equals(object? obj) => obj is Course c && _credits == c._credits;
     }
 }
