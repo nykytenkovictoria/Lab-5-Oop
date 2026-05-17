@@ -148,5 +148,26 @@ namespace DigitalUniversity
         }
 
         public override string ToString() => $"Classroom {_roomNumber} (cap. {_capacity})";
+
+        public static Classroom operator +(Classroom a, Classroom b)
+        {
+            var result = new Classroom(
+                a._roomNumber + "+" + b._roomNumber,
+                a._capacity + b._capacity,
+                a.Building
+            );
+            Console.WriteLine($"[Classroom op+] Об'єднано: ауд.{result.RoomNumber}, місць={result.Capacity}");
+            return result;
+        }
+
+        // Оператори порівняння: по кількості місць
+        public static bool operator ==(Classroom a, Classroom b) => a._capacity == b._capacity;
+        public static bool operator !=(Classroom a, Classroom b) => a._capacity != b._capacity;
+        public static bool operator >(Classroom a, Classroom b) => a._capacity > b._capacity;
+        public static bool operator <(Classroom a, Classroom b) => a._capacity < b._capacity;
+        public static bool operator >=(Classroom a, Classroom b) => a._capacity >= b._capacity;
+        public static bool operator <=(Classroom a, Classroom b) => a._capacity <= b._capacity;
+
+        public override bool Equals(object? obj) => obj is Classroom c && _capacity == c._capacity;
     }
 }
