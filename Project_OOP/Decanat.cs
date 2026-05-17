@@ -37,10 +37,6 @@ namespace DigitalUniversity
 
         public string FullInfo { get; private set; }
 
-        static Decanat()
-        {
-            Console.WriteLine("[Decanat] Статичний конструктор: клас ініціалізовано.");
-        }
 
         public Decanat()
         {

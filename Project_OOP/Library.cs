@@ -38,11 +38,6 @@ namespace DigitalUniversity
 
         public string FullInfo { get; private set; }
 
-        static Library()
-        {
-            Console.WriteLine("[Library] Статичний конструктор: клас ініціалізовано.");
-        }
-
         public Library()
         {
             _location = "—";
