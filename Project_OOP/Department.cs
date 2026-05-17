@@ -38,11 +38,6 @@ namespace DigitalUniversity
 
         public string FullInfo { get; private set; }
 
-        // 1. Статичний конструктор
-        static Department()
-        {
-            Console.WriteLine("[Department] Статичний конструктор: клас ініціалізовано.");
-        }
 
         // 2. Конструктор без параметрів
         public Department()

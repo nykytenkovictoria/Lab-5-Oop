@@ -1,0 +1,4 @@
+C# in Depth – Jon Skeet
+Design Patterns – GoF
+Clean Code – Robert Martin
+Algorithms – Sedgewick
