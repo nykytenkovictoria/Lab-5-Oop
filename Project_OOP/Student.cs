@@ -5,7 +5,7 @@ using System.Dynamic;
 
 namespace DigitalUniversity
 {
-   
+
     public class Student
     {
         private string _id;
@@ -19,7 +19,8 @@ namespace DigitalUniversity
         public string Id
         {
             get => _id;
-            set { 
+            set
+            {
                 if (!string.IsNullOrWhiteSpace(value))
                     _id = value;
             }
@@ -34,14 +35,14 @@ namespace DigitalUniversity
             }
         }
 
-        public int MissedClasses 
-        { 
-            get => _missedClasses; 
-            set 
-            { 
+        public int MissedClasses
+        {
+            get => _missedClasses;
+            set
+            {
                 if (value >= 0)
-                    _missedClasses = value; 
-            } 
+                    _missedClasses = value;
+            }
         }
 
         public string Group
@@ -53,10 +54,11 @@ namespace DigitalUniversity
         public double GPA
         {
             get => _gpa;
-            set { 
+            set
+            {
                 if (value >= 0.0 && value <= 100.0)
-                    _gpa = value; 
-            
+                    _gpa = value;
+
             }
         }
 
@@ -89,10 +91,10 @@ namespace DigitalUniversity
         // 2. Конструктор без параметрів
         public Student()
         {
-            _id = "S-000"; 
-            _name = "Невідомий"; 
-            _group = "—"; 
-            _course = "—"; 
+            _id = "S-000";
+            _name = "Невідомий";
+            _group = "—";
+            _course = "—";
             _gpa = 0.0;
             _missedClasses = 0;
             IsActive = false;
@@ -104,9 +106,9 @@ namespace DigitalUniversity
         public Student(string id, string name, string group, string course)
         {
             _id = id;
-            _name = name; 
-            _group = group; 
-            _course = course; 
+            _name = name;
+            _group = group;
+            _course = course;
             _gpa = 0.0;
             _missedClasses = 0;
             IsActive = true;
@@ -167,9 +169,9 @@ namespace DigitalUniversity
                 $"opens electronic cabinet. Group: {_group}, Course: {_course}");
             Console.WriteLine($"  Група: {_group} " +
                 $"| Курс: {_course} | GPA: {_gpa}");
-            Console.WriteLine($"  Статус: {(IsExcellentStudent() ? 
-                "Відмінник" : IsAtRisk() ? 
-                "Під загрозою відрахування" 
+            Console.WriteLine($"  Статус: {(IsExcellentStudent() ?
+                "Відмінник" : IsAtRisk() ?
+                "Під загрозою відрахування"
                 : "Звичайний студент")}");
         }
 
@@ -209,5 +211,48 @@ namespace DigitalUniversity
         }
 
         public override string ToString() => $"Student [{_id}] {_name}, group {_group}";
+
+        // Бінарний -  : різниця GPA між двома студентами 
+        public static double operator -(Student a, Student b)
+        {
+            double diff = Math.Abs(a._gpa - b._gpa);
+            Console.WriteLine($"[Student op-] Різниця GPA між {a.Name} та {b.Name}: {diff}");
+            return diff;
+        }
+
+        // Унарний ++  : підвищити GPA на 1 бал
+        public static Student operator ++(Student s)
+        {
+            s._gpa = Math.Min(100, s._gpa + 1);
+            s.FullInfo = s.BuildInfo();
+            Console.WriteLine($"[Student op++] {s.Name}: GPA підвищено до {s.GPA}");
+            return s;
+        }
+
+        // Унарний --  : знизити GPA на 1 бал
+        public static Student operator --(Student s)
+        {
+            s._gpa = Math.Max(0, s._gpa - 1);
+            s.FullInfo = s.BuildInfo();
+            Console.WriteLine($"[Student op--] {s.Name}: GPA знижено до {s.GPA}");
+            return s;
+        }
+
+
+        // Унарний !   : чи НЕ відмінник
+        public static bool operator !(Student s) => !s.IsExcellentStudent();
+
+
+        // true / false : студент "активний"
+        public static bool operator true(Student s) => s.IsActive;
+        public static bool operator false(Student s) => !s.IsActive;
+
+        // Оператори порівняння
+        public static bool operator ==(Student a, Student b) => a._gpa == b._gpa;
+        public static bool operator !=(Student a, Student b) => a._gpa != b._gpa;
+        public static bool operator >(Student a, Student b) => a._gpa > b._gpa;
+        public static bool operator <(Student a, Student b) => a._gpa < b._gpa;
+        public static bool operator >=(Student a, Student b) => a._gpa >= b._gpa;
+        public static bool operator <=(Student a, Student b) => a._gpa <= b._gpa;
     }
 }
