@@ -1,35 +1,17 @@
 ﻿// Teacher.cs
 // Електронний кабінет викладача
 
+
+
 namespace DigitalUniversity
 {
-    public class Teacher
+    public class Teacher : UniversityPerson
     {
-        private string _id;
-        private string _name;
         private string _position;
         private int _experienceYears;
         private int _coursesCount;
         private static int _totalTeachers;
 
-        public string Id
-        {
-            get => _id;
-            set
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                    _id = value;
-            }
-        }
-        public string Name
-        {
-            get => _name;
-            set
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                    _name = value;
-            }
-        }
 
         public string Position
         {
@@ -61,10 +43,8 @@ namespace DigitalUniversity
         }
 
         // 2. Конструктор без параметрів
-        public Teacher()
+        public Teacher() : base("T-000", "Невідомий")
         {
-            _id = "T-000";
-            _name = "Невідомий";
             _position = "—";
             _experienceYears = 0;
             Department = "—";
@@ -74,10 +54,8 @@ namespace DigitalUniversity
         }
 
         // 3. Конструктор з параметрами
-        public Teacher(string id, string name, string position)
+        public Teacher(string id, string name, string position) : base(id, name)
         {
-            _id = id;
-            _name = name;
             _position = position;
             _experienceYears = 0;
             Department = "—";
@@ -97,10 +75,8 @@ namespace DigitalUniversity
         }
 
         // 5. Конструктор копії
-        public Teacher(Teacher other)
+        public Teacher(Teacher other) : base(other._id + "-copy", other._name)
         {
-            _id = other._id + "-copy";
-            _name = other._name;
             _position = other._position;
             _experienceYears = other._experienceYears;
             Department = other.Department;
@@ -110,9 +86,8 @@ namespace DigitalUniversity
         }
 
         // 6. Закритий конструктор
-        private Teacher(string id)
+        private Teacher(string id) : base(id, "Guest", false)
         {
-            _id = id; _name = "Guest";
             _position = "—";
             Department = "—";
             FullInfo = BuildInfo();
@@ -134,11 +109,13 @@ namespace DigitalUniversity
         public bool BelongsToDepartment(string deptName) =>
             Department.Equals(deptName, StringComparison.OrdinalIgnoreCase);
 
+        public override string GetRole() => "Teacher";
+
         private string BuildInfo() =>
             $"[{_id}] {_name} | Посада: {_position} | Досвід: {_experienceYears} р. | Кафедра: {Department}";
 
         // Opens the teacher's personal electronic cabinet.
-        public void ViewCabinet()
+        public override void ViewCabinet()
         {
             Console.WriteLine($"[Teacher] {_name} ({_position}) opens electronic cabinet.");
             Console.WriteLine($"  Посада: {_position} | Досвід: {_experienceYears} р. | Кафедра: {Department}");
@@ -161,11 +138,16 @@ namespace DigitalUniversity
             Console.WriteLine($"[Teacher] {_name} posts '{materialTitle}' to course '{course.Title}'");
         }
 
+        public override bool CanSubmitReport() => IsActive && _coursesCount > 0;
+
         // Submits a report to the system.
-        public void SubmitReport(OnlineReport report)
+        public override void SubmitReport(OnlineReport report)
         {
-            Console.WriteLine($"[Teacher] {_name} submits report: {report.Type}");
-            report.Submit();
+            if (CanSubmitReport()) 
+            {
+                Console.WriteLine($"[Teacher] {_name} submits report: {report.Type}");
+                report.Submit();
+            }
         }
 
 
@@ -192,7 +174,7 @@ namespace DigitalUniversity
             Console.WriteLine($"  Може брати курси   : {CanTakeMoreCourses()}");
         }
 
-        public void PrintInfo()
+        public override void PrintInfo()
         {
             Console.WriteLine($"  ID           : {_id}");
             Console.WriteLine($"  Ім'я         : {_name}");
@@ -222,5 +204,6 @@ namespace DigitalUniversity
         public static bool operator <=(Teacher a, Teacher b) => a._experienceYears <= b._experienceYears;
 
         public override bool Equals(object? obj) => obj is Teacher t && _experienceYears == t._experienceYears;
+        public override int GetHashCode() => _experienceYears.GetHashCode();
     }
 }

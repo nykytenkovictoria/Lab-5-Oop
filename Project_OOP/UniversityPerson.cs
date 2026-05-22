@@ -11,7 +11,15 @@ namespace DigitalUniversity
         protected string _name;
 
         public string Id => _id;
-        public string Name => _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    _name = value;
+            }
+        }
         public bool IsActive { get; set; }
         protected UniversityPerson(string id, string name, bool isActive = true)
         {

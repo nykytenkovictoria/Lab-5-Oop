@@ -6,34 +6,13 @@ using System.Dynamic;
 namespace DigitalUniversity
 {
 
-    public class Student
+    public class Student : UniversityPerson
     {
-        private string _id;
-        private string _name;
         private string _group;
         private string _course;
         private double _gpa;
         private int _missedClasses;
         private static int _totalStudents;
-
-        public string Id
-        {
-            get => _id;
-            set
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                    _id = value;
-            }
-        }
-        public string Name
-        {
-            get => _name;
-            set
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                    _name = value;
-            }
-        }
 
         public int MissedClasses
         {
@@ -64,7 +43,6 @@ namespace DigitalUniversity
 
         public static int TotalStudents => _totalStudents;
 
-        public bool IsActive { get; set; }
 
         // Закритий сетер
         public string FullInfo { get; private set; }
@@ -89,29 +67,23 @@ namespace DigitalUniversity
         }
 
         // 2. Конструктор без параметрів
-        public Student()
+        public Student() : base("S-000", "Невідомий", false)
         {
-            _id = "S-000";
-            _name = "Невідомий";
             _group = "—";
             _course = "—";
             _gpa = 0.0;
             _missedClasses = 0;
-            IsActive = false;
             FullInfo = BuildInfo();
             _totalStudents++;
             Console.WriteLine($"[Student] Конструктор без параметрів: створено '{_name}'");
         }
 
-        public Student(string id, string name, string group, string course)
+        public Student(string id, string name, string group, string course) : base(id, name, true)
         {
-            _id = id;
-            _name = name;
             _group = group;
             _course = course;
             _gpa = 0.0;
             _missedClasses = 0;
-            IsActive = true;
             FullInfo = BuildInfo();
             _totalStudents++;
             Console.WriteLine($"[Student] Конструктор з параметрами: створено '{_name}', група {_group}");
@@ -128,15 +100,12 @@ namespace DigitalUniversity
         }
 
         // 5. Конструктор копії
-        public Student(Student other)
+        public Student(Student other) : base(other._id + "-copy", other._name, other.IsActive)
         {
-            _id = other._id + "-copy";
-            _name = other._name;
             _group = other._group;
             _course = other._course;
             _gpa = other._gpa;
             _missedClasses = other._missedClasses;
-            IsActive = other.IsActive;
             FullInfo = BuildInfo();
             _totalStudents++;
             Console.WriteLine($"[Student] Конструктор копії: скопійовано '{_name}'");
@@ -144,14 +113,11 @@ namespace DigitalUniversity
 
 
         // 6. Закритий конструктор
-        private Student(string id)
+        private Student(string id) : base(id, "System", false)
         {
-            _id = id;
-            _name = "System";
             _group = "—";
             _course = "—";
             _missedClasses = 0;
-            IsActive = false;
             FullInfo = BuildInfo();
             Console.WriteLine($"[Student] Закритий конструктор: службовий [{_id}]");
         }
@@ -162,8 +128,10 @@ namespace DigitalUniversity
         private string BuildInfo() =>
             $"[{_id}] {_name} | Група: {_group} | Курс: {_course} | GPA: {_gpa}";
 
+        public override string GetRole() => "Student";
+
         // Opens the student's personal electronic cabinet.
-        public void ViewCabinet()
+        public override void ViewCabinet()
         {
             Console.WriteLine($"[Student] {_name} " +
                 $"opens electronic cabinet. Group: {_group}, Course: {_course}");
@@ -175,11 +143,17 @@ namespace DigitalUniversity
                 : "Звичайний студент")}");
         }
 
+        public override bool CanSubmitReport() => IsActive && !HasDebt();
+
         // Submits a report or assignment.
-        public void SubmitReport(OnlineReport report)
+        public override void SubmitReport(OnlineReport report)
         {
-            Console.WriteLine($"[Student] {_name} submits report: {report.Type}");
-            report.Submit();
+            if (CanSubmitReport())
+            {
+                Console.WriteLine($"[Student] {_name} submits report: {report.Type}");
+                report.Submit();
+            }
+
         }
 
         // Views the current class schedule
@@ -198,7 +172,7 @@ namespace DigitalUniversity
             Console.WriteLine($"  Активний/зарахований: {IsEnrolledAndActive()}");
         }
 
-        public void PrintInfo()
+        public override void PrintInfo()
         {
             Console.WriteLine($"  ID           : {_id}");
             Console.WriteLine($"  Ім'я         : {_name}");
@@ -256,5 +230,7 @@ namespace DigitalUniversity
         public static bool operator <=(Student a, Student b) => a._gpa <= b._gpa;
 
         public override bool Equals(object? obj) => obj is Student s && _gpa == s._gpa;
+
+        public override int GetHashCode() => _gpa.GetHashCode();
     }
 }
