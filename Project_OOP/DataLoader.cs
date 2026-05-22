@@ -185,10 +185,10 @@ namespace DigitalUniversity
                     var r = new Classroom(
                         roomNumber: f[0],
                         capacity: int.TryParse(f[1], out var cap) ? cap : 0,
-                        building: f[2]
+                        location: f[2]
                     );
                     list.Add(r);
-                    Console.WriteLine($"Аудиторія завантажена: {r.RoomNumber} ({r.Capacity} місць, {r.Building})");
+                    Console.WriteLine($"Аудиторія завантажена: {r.RoomNumber} ({r.Capacity} місць, {r.Location})");
                 }
                 else if (f.Length == 2) 
                 {
@@ -197,7 +197,7 @@ namespace DigitalUniversity
                         capacity: int.TryParse(f[1], out var cap) ? cap : 0
                     );
                     list.Add(r);
-                    Console.WriteLine($"Аудиторія завантажена: {r.RoomNumber} ({r.Capacity} місць, {r.Building})");
+                    Console.WriteLine($"Аудиторія завантажена: {r.RoomNumber} ({r.Capacity} місць, {r.Location})");
                 }
             }
             return list;

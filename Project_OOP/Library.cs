@@ -5,31 +5,12 @@ using System.Collections.Generic;
 
 namespace DigitalUniversity
 {
-    public class Library
+    public class Library : UniversityResource
     {
-        private string _location;
-        private int _capacity;
         private List<Classroom> _classrooms = new();
         private List<string> _catalog = new();
         private List<string> _borrowedBooks = new();
 
-        public string Location
-        {
-            get => _location;
-            set { 
-                if (!string.IsNullOrWhiteSpace(value))
-                    _location = value; 
-            }
-        }
-
-        public int Capacity
-        {
-            get => _capacity;
-            set { 
-                if (value > 0) 
-                    _capacity = value; 
-            }
-        }
 
         public int ClassroomCount => _classrooms.Count;
         public int BookCount => _catalog.Count;
@@ -38,19 +19,15 @@ namespace DigitalUniversity
 
         public string FullInfo { get; private set; }
 
-        public Library()
+        public Library() : base("-", 0)
         {
-            _location = "—";
-            _capacity = 0;
             IsOpen = false;
             FullInfo = BuildInfo();
             Console.WriteLine("[Library] Конструктор без параметрів: бібліотеку створено.");
         }
 
-        public Library(string location, int capacity)
+        public Library(string location, int capacity) : base(location, capacity) 
         {
-            _location = location;
-            _capacity = capacity; 
             IsOpen = true;
             FullInfo = BuildInfo();
             Console.WriteLine($"[Library] Конструктор з параметрами: '{_location}', місць: {_capacity}");
@@ -64,25 +41,26 @@ namespace DigitalUniversity
             Console.WriteLine($"[Library] Конструктор виклику іншого: відкрита={IsOpen}");
         }
 
-        public Library(Library other)
+        public Library(Library other): base(other._location + "-copy", other._capacity)
         {
-            _location = other._location + " (копія)";
-            _capacity = other._capacity;
             IsOpen = other.IsOpen;
             FullInfo = BuildInfo();
             Console.WriteLine($"[Library] Конструктор копії: скопійовано '{_location}'");
         }
 
-        private Library(string location)
+        private Library(string location) : base(location, 0)
         {
-            _location = location;
-            _capacity = 0;
             IsOpen = false;
             FullInfo = BuildInfo();
             Console.WriteLine($"[Library] Закритий конструктор: резервна бібліотека '{_location}'");
         }
 
         public static Library CreateReserve(string location) => new Library(location);
+
+        public override void GetInfo()
+            => Console.WriteLine($"[Library] {FullInfo} | Книг: {_catalog.Count} | Ауд.: {_classrooms.Count}");
+
+        public override bool IsAvailable() => IsOpen && _catalog.Count > 0;
 
         public bool IsLibraryOpen() => IsOpen;
 
