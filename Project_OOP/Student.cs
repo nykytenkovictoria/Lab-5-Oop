@@ -137,10 +137,7 @@ namespace DigitalUniversity
                 $"opens electronic cabinet. Group: {_group}, Course: {_course}");
             Console.WriteLine($"  Група: {_group} " +
                 $"| Курс: {_course} | GPA: {_gpa}");
-            Console.WriteLine($"  Статус: {(IsExcellentStudent() ?
-                "Відмінник" : IsAtRisk() ?
-                "Під загрозою відрахування"
-                : "Звичайний студент")}");
+            CheckStatus();
         }
 
         public override bool CanSubmitReport() => IsActive && !HasDebt();

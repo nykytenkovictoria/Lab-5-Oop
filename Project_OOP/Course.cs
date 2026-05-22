@@ -155,7 +155,8 @@ namespace DigitalUniversity
         /// Displays course summary information.
         public void GetInfo()
         {
-            Console.WriteLine($"[Course] ID={_courseId}, Title='{_title}', Credits={_credits}");
+            PrintInfo();
+            PrintEnrollmentStatus();
         }
 
         public void PrintEnrollmentStatus()
@@ -223,5 +224,7 @@ namespace DigitalUniversity
         public static bool operator <=(Course a, Course b) => a._credits <= b._credits;
 
         public override bool Equals(object? obj) => obj is Course c && _credits == c._credits;
+
+        public override int GetHashCode() => _credits.GetHashCode();
     }
 }

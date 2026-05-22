@@ -119,8 +119,7 @@ namespace DigitalUniversity
         {
             Console.WriteLine($"[Teacher] {_name} ({_position}) opens electronic cabinet.");
             Console.WriteLine($"  Посада: {_position} | Досвід: {_experienceYears} р. | Кафедра: {Department}");
-            Console.WriteLine($"  Рівень: {(IsProfessor() ? "Професор" : IsSenior() ?
-                "Старший викладач" : "Молодший викладач")}");
+            CheckStatus();
         }
 
         // Grades a student for a given course.
