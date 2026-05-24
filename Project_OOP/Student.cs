@@ -63,11 +63,10 @@ namespace DigitalUniversity
         static Student()
         {
             _totalStudents = 0;
-            Console.WriteLine("[Student] Статичний конструктор: клас ініціалізовано.");
         }
 
         // 2. Конструктор без параметрів
-        public Student() : base("S-000", "Невідомий", false)
+        public Student() : base("S-000", Messages.Get("student", "unknown_name"), false)
         {
             _group = "—";
             _course = "—";
@@ -75,7 +74,6 @@ namespace DigitalUniversity
             _missedClasses = 0;
             FullInfo = BuildInfo();
             _totalStudents++;
-            Console.WriteLine($"[Student] Конструктор без параметрів: створено '{_name}'");
         }
 
         public Student(string id, string name, string group, string course) : base(id, name, true)
@@ -86,7 +84,6 @@ namespace DigitalUniversity
             _missedClasses = 0;
             FullInfo = BuildInfo();
             _totalStudents++;
-            Console.WriteLine($"[Student] Конструктор з параметрами: створено '{_name}', група {_group}");
         }
 
         // 4. Конструктор що викликає інший конструктор
@@ -96,7 +93,6 @@ namespace DigitalUniversity
             _gpa = gpa;
             _missedClasses = missedClasses;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Student] Конструктор виклику іншого: GPA = {_gpa}");
         }
 
         // 5. Конструктор копії
@@ -108,35 +104,31 @@ namespace DigitalUniversity
             _missedClasses = other._missedClasses;
             FullInfo = BuildInfo();
             _totalStudents++;
-            Console.WriteLine($"[Student] Конструктор копії: скопійовано '{_name}'");
         }
 
 
         // 6. Закритий конструктор
-        private Student(string id) : base(id, "System", false)
+        private Student(string id) : base(id, Messages.Get("student", "system_name"), false)
         {
             _group = "—";
             _course = "—";
             _missedClasses = 0;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Student] Закритий конструктор: службовий [{_id}]");
         }
 
         public static Student CreateSystem(string id) => new Student(id);
 
 
         private string BuildInfo() =>
-            $"[{_id}] {_name} | Група: {_group} | Курс: {_course} | GPA: {_gpa}";
+            Messages.Get("student", "build_info", _id, _name, _group, _course, _gpa);
 
-        public override string GetRole() => "Student";
+        public override string GetRole() => Messages.Get("student", "role");
 
         // Opens the student's personal electronic cabinet.
         public override void ViewCabinet()
         {
-            Console.WriteLine($"[Student] {_name} " +
-                $"opens electronic cabinet. Group: {_group}, Course: {_course}");
-            Console.WriteLine($"  Група: {_group} " +
-                $"| Курс: {_course} | GPA: {_gpa}");
+            Messages.Print("student", "cabinet_open", _name, _group, _course);
+            PrintInfo();
             CheckStatus();
         }
 
@@ -147,7 +139,7 @@ namespace DigitalUniversity
         {
             if (CanSubmitReport())
             {
-                Console.WriteLine($"[Student] {_name} submits report: {report.Type}");
+                Messages.Print("student", "submit_report", _name, report.Type);
                 report.Submit();
             }
 
@@ -156,38 +148,38 @@ namespace DigitalUniversity
         // Views the current class schedule
         public void ViewSchedule()
         {
-            Console.WriteLine($"[Student] {_name} views schedule for group {_group}");
+            Messages.Print("student", "view_schedule", _name, _group);
         }
 
         public void CheckStatus()
         {
-            Console.WriteLine($"[Student] Статус {_name}:");
-            Console.WriteLine($"  Відмінник          : {IsExcellentStudent()}");
-            Console.WriteLine($"  Під загрозою       : {IsAtRisk()}");
-            Console.WriteLine($"  Є заборгованість   : {HasDebt()}");
-            Console.WriteLine($"  Право на стипендію : {IsEligibleForScholarship()}");
-            Console.WriteLine($"  Активний/зарахований: {IsEnrolledAndActive()}");
+            Messages.Print("student", "check_status", _name);
+            Messages.Print("student", "predicate_excellent", IsExcellentStudent());
+            Messages.Print("student", "predicate_risk", IsAtRisk());
+            Messages.Print("student", "predicate_debt", HasDebt());
+            Messages.Print("student", "predicate_scholarship", IsEligibleForScholarship());
+            Messages.Print("student", "predicate_active", IsEnrolledAndActive());
         }
 
         public override void PrintInfo()
         {
-            Console.WriteLine($"  ID           : {_id}");
-            Console.WriteLine($"  Ім'я         : {_name}");
-            Console.WriteLine($"  Група        : {_group}");
-            Console.WriteLine($"  Курс         : {_course}");
-            Console.WriteLine($"  GPA          : {_gpa}");
-            Console.WriteLine($"  Активний     : {IsActive}");
-            Console.WriteLine($"  FullInfo     : {FullInfo}");
-            Console.WriteLine($"  Всього студ. : {TotalStudents}");
+            Console.WriteLine($"  {Messages.Get("student", "id")}           : {_id}");
+            Console.WriteLine($"  {Messages.Get("student", "name_label")}         : {_name}");
+            Console.WriteLine($"  {Messages.Get("student", "group_label")}        : {_group}");
+            Console.WriteLine($"  {Messages.Get("student", "course_label")}        : {_course}");
+            Console.WriteLine($"  {Messages.Get("student", "gpa_label")}          : {_gpa}");
+            Console.WriteLine($"  {Messages.Get("student", "active_label")}     : {IsActive}");
+            Console.WriteLine($"  {Messages.Get("student", "fullinfo_label")}     : {FullInfo}");
+            Console.WriteLine($"  {Messages.Get("student", "total_students_label")} : {TotalStudents}");
         }
 
-        public override string ToString() => $"Student [{_id}] {_name}, group {_group}";
+        public override string ToString() => Messages.Get("student", "to_string", _id, _name, _group);
 
         // Бінарний -  : різниця GPA між двома студентами 
         public static double operator -(Student a, Student b)
         {
             double diff = Math.Abs(a._gpa - b._gpa);
-            Console.WriteLine($"[Student op-] Різниця GPA між {a.Name} та {b.Name}: {diff}");
+            Messages.Print("student", "op_minus", a.Name, b.Name, diff);
             return diff;
         }
 
@@ -196,7 +188,7 @@ namespace DigitalUniversity
         {
             s._gpa = Math.Min(100, s._gpa + 1);
             s.FullInfo = s.BuildInfo();
-            Console.WriteLine($"[Student op++] {s.Name}: GPA підвищено до {s.GPA}");
+            Messages.Print("student", "op_increment", s.Name, s.GPA);
             return s;
         }
 
@@ -205,7 +197,7 @@ namespace DigitalUniversity
         {
             s._gpa = Math.Max(0, s._gpa - 1);
             s.FullInfo = s.BuildInfo();
-            Console.WriteLine($"[Student op--] {s.Name}: GPA знижено до {s.GPA}");
+            Messages.Print("student", "op_decrement", s.Name, s.GPA);
             return s;
         }
 

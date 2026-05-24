@@ -37,6 +37,7 @@ class Program
 
         PrintHeader();
 
+        LoadAllMessages();
         LoadAllData();
         BuildUniversity();
         EnrollStudents();
@@ -76,6 +77,11 @@ class Program
         Console.WriteLine("==============================================");
     }
 
+
+    static void LoadAllMessages()
+    {
+        Messages.Load(Path.Combine(dataDir, "messages.json"));
+    }
 
     static void LoadAllData()
     {
@@ -183,11 +189,7 @@ class Program
         Console.WriteLine("\n=== Предикати — статус студентів ===\n");
         foreach (var s in students)
         {
-            Console.WriteLine($"  [{s.Name}] GPA={s.GPA}, Пропуски={s.MissedClasses}");
-            Console.WriteLine($"    Відмінник     : {s.IsExcellentStudent()}");
-            Console.WriteLine($"    Під загрозою  : {s.IsAtRisk()}");
-            Console.WriteLine($"    Є заборг.     : {s.HasDebt()}");
-            Console.WriteLine($"    Стипендія     : {s.IsEligibleForScholarship()}");
+            s.ViewCabinet();
         }
     }
 
@@ -196,10 +198,7 @@ class Program
         Console.WriteLine("\n=== Предикати — статус викладачів ===\n");
         foreach (var t in teachers)
         {
-            Console.WriteLine($"  [{t.Name}] Посада={t.Position}, Досвід={t.ExperienceYears}р.");
-            Console.WriteLine($"    Старший       : {t.IsSenior()}");
-            Console.WriteLine($"    Професор      : {t.IsProfessor()}");
-            Console.WriteLine($"    Може курси    : {t.CanTakeMoreCourses()}");
+            t.ViewCabinet();
         }
     }
 
