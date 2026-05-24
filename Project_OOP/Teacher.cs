@@ -39,18 +39,16 @@ namespace DigitalUniversity
         static Teacher()
         {
             _totalTeachers = 0;
-            Console.WriteLine("[Teacher] Статичний конструктор: клас ініціалізовано.");
         }
 
         // 2. Конструктор без параметрів
-        public Teacher() : base("T-000", "Невідомий")
+        public Teacher() : base("T-000", Messages.Get("teacher", "unknown_name"))
         {
-            _position = "—";
+            _position = Messages.Get("teacher", "default_position");
             _experienceYears = 0;
-            Department = "—";
+            Department = Messages.Get("teacher", "default_department");
             FullInfo = BuildInfo();
             _totalTeachers++;
-            Console.WriteLine($"[Teacher] Конструктор без параметрів: створено '{_name}'");
         }
 
         // 3. Конструктор з параметрами
@@ -58,10 +56,9 @@ namespace DigitalUniversity
         {
             _position = position;
             _experienceYears = 0;
-            Department = "—";
+            Department = Messages.Get("teacher", "default_department");
             FullInfo = BuildInfo();
             _totalTeachers++;
-            Console.WriteLine($"[Teacher] Конструктор з параметрами: створено '{_name}', посада: {_position}");
         }
 
         // 4. Конструктор що викликає інший конструктор
@@ -71,7 +68,6 @@ namespace DigitalUniversity
             _experienceYears = experienceYears;
             Department = department;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Teacher] Конструктор виклику іншого: досвід={_experienceYears} р., кафедра={Department}");
         }
 
         // 5. Конструктор копії
@@ -82,22 +78,20 @@ namespace DigitalUniversity
             Department = other.Department;
             FullInfo = BuildInfo();
             _totalTeachers++;
-            Console.WriteLine($"[Teacher] Конструктор копії: скопійовано '{_name}'");
         }
 
         // 6. Закритий конструктор
-        private Teacher(string id) : base(id, "Guest", false)
+        private Teacher(string id) : base(id, Messages.Get("teacher", "guest_name"), false)
         {
-            _position = "—";
-            Department = "—";
+            _position = Messages.Get("teacher", "default_position");
+            Department = Messages.Get("teacher", "default_department");
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Teacher] Закритий конструктор: гостьовий [{_id}]");
         }
 
         public static Teacher CreateGuest(string id) => new Teacher(id);
         public bool IsSenior() => _experienceYears >= 10;
 
-        public bool IsProfessor() => _position.Contains("Проф", StringComparison.OrdinalIgnoreCase);
+        public bool IsProfessor() => _position.Contains(Messages.Get("teacher", "professor_keyword"), StringComparison.OrdinalIgnoreCase);
 
         /// Чи перевантажений викладач (більше 4 курсів)
         public bool IsOverloaded() => _coursesCount > 4;
@@ -109,16 +103,16 @@ namespace DigitalUniversity
         public bool BelongsToDepartment(string deptName) =>
             Department.Equals(deptName, StringComparison.OrdinalIgnoreCase);
 
-        public override string GetRole() => "Teacher";
+        public override string GetRole() => Messages.Get("teacher", "role");
 
         private string BuildInfo() =>
-            $"[{_id}] {_name} | Посада: {_position} | Досвід: {_experienceYears} р. | Кафедра: {Department}";
+            Messages.Get("teacher", "build_info", _id, _name, _position, _experienceYears, Department);
 
         // Opens the teacher's personal electronic cabinet.
         public override void ViewCabinet()
         {
-            Console.WriteLine($"[Teacher] {_name} ({_position}) opens electronic cabinet.");
-            Console.WriteLine($"  Посада: {_position} | Досвід: {_experienceYears} р. | Кафедра: {Department}");
+            Messages.Print("teacher", "cabinet_open", _name, _position);
+            Console.WriteLine(Messages.Get("teacher", "cabinet_info", _position, _experienceYears, Department));
             CheckStatus();
         }
 
@@ -126,15 +120,15 @@ namespace DigitalUniversity
         public void GradeStudent(Student student, Course course, int grade)
         {
             student.GPA = grade;
-            Console.WriteLine($"[Teacher] {_name} виставляє {student.Name} оцінку {grade} з '{course.Title}'");
+            Messages.Print("teacher", "grade_student", _name, student.Name, grade, course.Title);
             if (student.IsExcellentStudent())
-                Console.WriteLine($"{student.Name} отримав статус відмінника!");
+                Messages.Print("teacher", "excellent_status", student.Name);
         }
 
         // Posts educational material to a course.
         public void PostMaterial(Course course, string materialTitle)
         {
-            Console.WriteLine($"[Teacher] {_name} posts '{materialTitle}' to course '{course.Title}'");
+            Messages.Print("teacher", "post_material", _name, materialTitle, course.Title);
         }
 
         public override bool CanSubmitReport() => IsActive && _coursesCount > 0;
@@ -142,9 +136,9 @@ namespace DigitalUniversity
         // Submits a report to the system.
         public override void SubmitReport(OnlineReport report)
         {
-            if (CanSubmitReport()) 
+            if (CanSubmitReport())
             {
-                Console.WriteLine($"[Teacher] {_name} submits report: {report.Type}");
+                Messages.Print("teacher", "submit_report", _name, report.Type);
                 report.Submit();
             }
         }
@@ -154,43 +148,42 @@ namespace DigitalUniversity
         {
             if (!CanTakeMoreCourses())
             {
-                Console.WriteLine($"[Teacher] {_name}:" +
-                $" перевантажений, не може взяти '{course.Title}'"); return;
+                Messages.Print("teacher", "overloaded_cannot_take", _name, course.Title);
+                return;
             }
             _coursesCount++;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Teacher] {_name}" +
-                $" призначений на курс '{course.Title}' (курсів: {_coursesCount})");
+            Messages.Print("teacher", "assign_course", _name, course.Title, _coursesCount);
         }
 
 
         public void CheckStatus()
         {
-            Console.WriteLine($"[Teacher] Статус {_name}:");
-            Console.WriteLine($"  Старший викладач   : {IsSenior()}");
-            Console.WriteLine($"  Професор           : {IsProfessor()}");
-            Console.WriteLine($"  Перевантажений     : {IsOverloaded()}");
-            Console.WriteLine($"  Може брати курси   : {CanTakeMoreCourses()}");
+            Messages.Print("teacher", "check_status", _name);
+            Messages.Print("teacher", "predicate_senior", IsSenior());
+            Messages.Print("teacher", "predicate_professor", IsProfessor());
+            Messages.Print("teacher", "predicate_overloaded", IsOverloaded());
+            Messages.Print("teacher", "predicate_can_take", CanTakeMoreCourses());
         }
 
         public override void PrintInfo()
         {
-            Console.WriteLine($"  ID           : {_id}");
-            Console.WriteLine($"  Ім'я         : {_name}");
-            Console.WriteLine($"  Посада       : {_position}");
-            Console.WriteLine($"  Досвід       : {_experienceYears} років");
-            Console.WriteLine($"  Кафедра      : {Department}");
-            Console.WriteLine($"  FullInfo     : {FullInfo}");
-            Console.WriteLine($"  Всього викл. : {TotalTeachers}");
+            Console.WriteLine($"  {Messages.Get("teacher", "id")}           : {_id}");
+            Console.WriteLine($"  {Messages.Get("teacher", "name_label")}         : {_name}");
+            Console.WriteLine($"  {Messages.Get("teacher", "position_label")}       : {_position}");
+            Console.WriteLine($"  {Messages.Get("teacher", "experience_label")}       : {_experienceYears} {Messages.Get("teacher", "years")}");
+            Console.WriteLine($"  {Messages.Get("teacher", "department_label")}      : {Department}");
+            Console.WriteLine($"  {Messages.Get("teacher", "fullinfo_label")}     : {FullInfo}");
+            Console.WriteLine($"  {Messages.Get("teacher", "total_teachers_label")} : {TotalTeachers}");
         }
 
-        public override string ToString() => $"Teacher [{_id}] {_name}, {_position}";
+        public override string ToString() => Messages.Get("teacher", "to_string", _id, _name, _position);
 
         public static Teacher operator ++(Teacher t)
         {
             t._experienceYears++;
             t.FullInfo = t.BuildInfo();
-            Console.WriteLine($"[Teacher op++] {t.Name}: досвід = {t.ExperienceYears} р.");
+            Messages.Print("teacher", "op_increment", t.Name, t.ExperienceYears);
             return t;
         }
 
