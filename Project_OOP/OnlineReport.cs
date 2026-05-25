@@ -14,9 +14,10 @@ namespace DigitalUniversity
         public string ReportId
         {
             get => _reportId;
-            set { 
+            set
+            {
                 if (!string.IsNullOrWhiteSpace(value))
-                    _reportId = value; 
+                    _reportId = value;
             }
         }
 
@@ -38,31 +39,28 @@ namespace DigitalUniversity
         static OnlineReport()
         {
             _totalReports = 0;
-            Console.WriteLine("[OnlineReport] Статичний конструктор: клас ініціалізовано.");
         }
 
         public OnlineReport()
         {
-            _reportId = "R-000";
-            _type = "—";
-            Author = "—";
+            _reportId = Messages.Get("onlinereport", "default_id");
+            _type = Messages.Get("onlinereport", "default_type");
+            Author = Messages.Get("onlinereport", "default_author");
             _submitted = false;
             _archived = false;
             FullInfo = BuildInfo();
             _totalReports++;
-            Console.WriteLine("[OnlineReport] Конструктор без параметрів: звіт створено.");
         }
 
         public OnlineReport(string reportId, string type)
         {
             _reportId = reportId;
             _type = type;
-            Author = "—";
+            Author = Messages.Get("onlinereport", "default_author");
             _submitted = false;
             _archived = false;
             FullInfo = BuildInfo();
             _totalReports++;
-            Console.WriteLine($"[OnlineReport] Конструктор з параметрами: [{_reportId}] '{_type}'");
         }
 
         public OnlineReport(string reportId, string type, string author)
@@ -70,7 +68,6 @@ namespace DigitalUniversity
         {
             Author = author;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[OnlineReport] Конструктор виклику іншого: автор={Author}");
         }
 
         public OnlineReport(OnlineReport other)
@@ -82,64 +79,67 @@ namespace DigitalUniversity
             _archived = false;
             FullInfo = BuildInfo();
             _totalReports++;
-            Console.WriteLine($"[OnlineReport] Конструктор копії: скопійовано [{_reportId}]");
         }
 
         private OnlineReport(string reportId)
         {
             _reportId = reportId;
-            _type = "Системний";
-            Author = "System";
+            _type = Messages.Get("onlinereport", "system_type");
+            Author = Messages.Get("onlinereport", "system_author");
             FullInfo = BuildInfo();
-            Console.WriteLine($"[OnlineReport] Закритий конструктор: системний [{_reportId}]");
         }
 
         public static OnlineReport CreateSystem(string id) => new OnlineReport(id);
 
         public bool IsPending() => !_submitted && !_archived;
- 
+
         /// Чи звіт вже закритий (поданий та архівований)
         public bool IsClosed() => _submitted && _archived;
- 
+
         /// Чи звіт має автора
-        public bool HasAuthor() => !string.IsNullOrEmpty(Author) && Author != "—";
+        public bool HasAuthor() => !string.IsNullOrEmpty(Author) && Author != Messages.Get("onlinereport", "default_author");
         private string BuildInfo() =>
-            $"[{_reportId}] {_type} | Автор: {Author} | Подано: {_submitted} | Архів: {_archived}";
+            Messages.Get("onlinereport", "build_info", _reportId, _type, Author, _submitted, _archived);
 
         // Generates report content (stub — logic to be implemented in later versions)
         public void Generate()
         {
-            Console.WriteLine($"[OnlineReport] Генерація звіту [{_reportId}] '{_type}'");
-            Console.WriteLine($"  Автор: {Author} | Стан: {(IsPending() ? "Очікує подачі" : "Оброблено")}");
+            Messages.Print("onlinereport", "generate_header", _reportId, _type);
+            Messages.Print("onlinereport", "generate_status", Author,
+                (IsPending() ?
+                Messages.Get("onlinereport", "status_pending") 
+                :
+                Messages.Get("onlinereport", "status_processed")
+                ));
         }
 
         // Marks the report as submitted.
         public void Submit()
         {
             _submitted = true;
-            Console.WriteLine($"[OnlineReport] Report [{_reportId}] '{_type}' submitted successfully.");
+            Messages.Print("onlinereport", "submit_success", _reportId, _type);
         }
 
         // Archives the report.
         public void Archive()
         {
             _archived = true;
-            Console.WriteLine($"[OnlineReport] Report [{_reportId}] archived. (Submitted: {_submitted})");
+            Messages.Print("onlinereport", "archive", _reportId, _submitted);
         }
 
         public void PrintInfo()
         {
-            Console.WriteLine($"  ID звіту     : {_reportId}");
-            Console.WriteLine($"  Тип          : {_type}");
-            Console.WriteLine($"  Автор        : {Author}");
-            Console.WriteLine($"  Подано       : {_submitted}");
-            Console.WriteLine($"  Архівовано   : {_archived}");
-            Console.WriteLine($"  FullInfo     : {FullInfo}");
-            Console.WriteLine($"  Очікує       : {IsPending()}");
-            Console.WriteLine($"  Закритий     : {IsClosed()}");
-            Console.WriteLine($"  Всього звітів: {TotalReports}");
+            Console.WriteLine($"  {Messages.Get("onlinereport", "id_label")}     : {_reportId}");
+            Console.WriteLine($"  {Messages.Get("onlinereport", "type_label")}          : {_type}");
+            Console.WriteLine($"  {Messages.Get("onlinereport", "author_label")}        : {Author}");
+            Console.WriteLine($"  {Messages.Get("onlinereport", "submitted_label")}       : {_submitted}");
+            Console.WriteLine($"  {Messages.Get("onlinereport", "archived_label")}   : {_archived}");
+            Console.WriteLine($"  {Messages.Get("onlinereport", "fullinfo_label")}     : {FullInfo}");
+            Console.WriteLine($"  {Messages.Get("onlinereport", "pending_label")}       : {IsPending()}");
+            Console.WriteLine($"  {Messages.Get("onlinereport", "closed_label")}     : {IsClosed()}");
+            Console.WriteLine($"  {Messages.Get("onlinereport", "total_reports_label")}: {TotalReports}");
         }
 
-        public override string ToString() => $"OnlineReport [{_reportId}] '{_type}' | submitted={_submitted}";
+        public override string ToString() => Messages.Get("onlinereport", "to_string", _reportId, _type, _submitted);
     }
 }

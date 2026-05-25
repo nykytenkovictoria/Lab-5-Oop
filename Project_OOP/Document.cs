@@ -14,7 +14,8 @@ namespace DigitalUniversity
         public string DocId
         {
             get => _docId;
-            set { 
+            set
+            {
                 if (!string.IsNullOrWhiteSpace(value))
                     _docId = value;
             }
@@ -38,31 +39,28 @@ namespace DigitalUniversity
         static Document()
         {
             _totalDocs = 0;
-            Console.WriteLine("[Document] Статичний конструктор: клас ініціалізовано.");
         }
 
         public Document()
         {
-            _docId = "D-000";
-            _docType = "—";
-            CreatedBy = "—";
+            _docId = Messages.Get("document", "default_id");
+            _docType = Messages.Get("document", "default_type");
+            CreatedBy = Messages.Get("document", "default_created_by");
             _signed = false;
             _archived = false;
             FullInfo = BuildInfo();
             _totalDocs++;
-            Console.WriteLine("[Document] Конструктор без параметрів: документ створено.");
         }
 
         public Document(string docId, string docType)
         {
             _docId = docId;
             _docType = docType;
-            CreatedBy = "System";
+            CreatedBy = Messages.Get("document", "system_created_by");
             _signed = false;
             _archived = false;
             FullInfo = BuildInfo();
             _totalDocs++;
-            Console.WriteLine($"[Document] Конструктор з параметрами: [{_docId}] '{_docType}'");
         }
 
         public Document(string docId, string docType, string createdBy)
@@ -70,7 +68,6 @@ namespace DigitalUniversity
         {
             CreatedBy = createdBy;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Document] Конструктор виклику іншого: автор={CreatedBy}");
         }
 
         public Document(Document other)
@@ -78,20 +75,18 @@ namespace DigitalUniversity
             _docId = other._docId + "-copy";
             _docType = other._docType;
             CreatedBy = other.CreatedBy;
-            _signed = false; 
+            _signed = false;
             _archived = false;
             FullInfo = BuildInfo();
             _totalDocs++;
-            Console.WriteLine($"[Document] Конструктор копії: скопійовано [{_docId}]");
         }
 
         private Document(string docId)
         {
             _docId = docId;
-            _docType = "Шаблон";
-            CreatedBy = "System";
+            _docType = Messages.Get("document", "template_type");
+            CreatedBy = Messages.Get("document", "system_created_by");
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Document] Закритий конструктор: шаблон [{_docId}]");
         }
 
         public static Document CreateTemplate(string id) => new Document(id);
@@ -105,44 +100,51 @@ namespace DigitalUniversity
         public bool IsInArchive() => _archived;
 
         private string BuildInfo() =>
-            $"[{_docId}] {_docType} | Автор: {CreatedBy} | Підписано: {_signed} | Архів: {_archived}";
+            Messages.Get("document", "build_info", _docId, _docType, CreatedBy, _signed, _archived);
 
         // Creates the document in the electronic workflow.
         public void Create()
         {
-            Console.WriteLine($"[Document] Created: [{_docId}] type='{_docType}'");
+            Messages.Print("document", "create", _docId, _docType);
         }
 
         // Signs the document digitally.
         public void Sign(string signerName)
         {
-            if (_archived) { Console.WriteLine($"[Document] [{_docId}] вже архівований, підпис неможливий."); return; }
-            _signed = true; FullInfo = BuildInfo();
-            Console.WriteLine($"[Document] [{_docId}] підписано: '{signerName}'");
+            if (_archived)
+            {
+                Messages.Print("document", "sign_archived", _docId);
+                return;
+            }
+            _signed = true;
+            FullInfo = BuildInfo();
+            Messages.Print("document", "sign_success", _docId, signerName);
         }
 
 
         /// Archives the document.
         public void Archive()
         {
-            if (!_signed) Console.WriteLine($"[Document] Увага: [{_docId}] архівується без підпису!");
-            _archived = true; FullInfo = BuildInfo();
-            Console.WriteLine($"[Document] [{_docId}] архівовано.");
+            if (!_signed)
+                Messages.Print("document", "archive_unsigned_warning", _docId);
+            _archived = true;
+            FullInfo = BuildInfo();
+            Messages.Print("document", "archive_success", _docId);
         }
 
 
         public void PrintInfo()
         {
-            Console.WriteLine($"  ID           : {_docId}");
-            Console.WriteLine($"  Тип          : {_docType}");
-            Console.WriteLine($"  Автор        : {CreatedBy}");
-            Console.WriteLine($"  Підписано    : {_signed}");
-            Console.WriteLine($"  Архівовано   : {_archived}");
-            Console.WriteLine($"  Готовий      : {IsReadyToIssue()}");
-            Console.WriteLine($"  FullInfo     : {FullInfo}");
-            Console.WriteLine($"  Всього докум.: {TotalDocs}");
+            Console.WriteLine($"  {Messages.Get("document", "id_label")}           : {_docId}");
+            Console.WriteLine($"  {Messages.Get("document", "type_label")}          : {_docType}");
+            Console.WriteLine($"  {Messages.Get("document", "author_label")}        : {CreatedBy}");
+            Console.WriteLine($"  {Messages.Get("document", "signed_label")}    : {_signed}");
+            Console.WriteLine($"  {Messages.Get("document", "archived_label")}   : {_archived}");
+            Console.WriteLine($"  {Messages.Get("document", "ready_label")}      : {IsReadyToIssue()}");
+            Console.WriteLine($"  {Messages.Get("document", "fullinfo_label")}     : {FullInfo}");
+            Console.WriteLine($"  {Messages.Get("document", "total_docs_label")}: {TotalDocs}");
         }
 
-        public override string ToString() => $"Document [{_docId}] '{_docType}' | signed={_signed}";
+        public override string ToString() => Messages.Get("document", "to_string", _docId, _docType, _signed);
     }
 }

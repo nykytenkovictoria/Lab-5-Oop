@@ -19,18 +19,16 @@ namespace DigitalUniversity
 
         public string FullInfo { get; private set; }
 
-        public Library() : base("-", 0)
+        public Library() : base(Messages.Get("library", "default_location"), 0)
         {
             IsOpen = false;
             FullInfo = BuildInfo();
-            Console.WriteLine("[Library] Конструктор без параметрів: бібліотеку створено.");
         }
 
-        public Library(string location, int capacity) : base(location, capacity) 
+        public Library(string location, int capacity) : base(location, capacity)
         {
             IsOpen = true;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Library] Конструктор з параметрами: '{_location}', місць: {_capacity}");
         }
 
         public Library(string location, int capacity, bool isOpen)
@@ -38,27 +36,24 @@ namespace DigitalUniversity
         {
             IsOpen = isOpen;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Library] Конструктор виклику іншого: відкрита={IsOpen}");
         }
 
-        public Library(Library other): base(other._location + "-copy", other._capacity)
+        public Library(Library other) : base(other._location + "-copy", other._capacity)
         {
             IsOpen = other.IsOpen;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Library] Конструктор копії: скопійовано '{_location}'");
         }
 
         private Library(string location) : base(location, 0)
         {
             IsOpen = false;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Library] Закритий конструктор: резервна бібліотека '{_location}'");
         }
 
         public static Library CreateReserve(string location) => new Library(location);
 
         public override void GetInfo()
-            => Console.WriteLine($"[Library] {FullInfo} | Книг: {_catalog.Count} | Ауд.: {_classrooms.Count}");
+            => Messages.Print("library", "get_info", FullInfo, _catalog.Count, _classrooms.Count);
 
         public override bool IsAvailable() => IsOpen && _catalog.Count > 0;
 
@@ -75,7 +70,7 @@ namespace DigitalUniversity
         public bool HasFreeClassrooms() => _classrooms.Exists(r => !r.IsBooked);
 
         private string BuildInfo() =>
-            $"Бібліотека: {_location} | Місць: {_capacity} | Відкрита: {IsOpen}";
+            Messages.Get("library", "build_info", _location, _capacity, IsOpen);
 
         // Adds a classroom to the campus fund (composition).
         public void AddClassroom(Classroom room) => _classrooms.Add(room);
@@ -86,40 +81,45 @@ namespace DigitalUniversity
         // Searches the electronic catalog for a keyword.
         public void SearchBook(string keyword)
         {
-            Console.WriteLine($"[Library] Searching catalog for '{keyword}'...");
+            Messages.Print("library", "search_header", keyword);
             var found = _catalog.FindAll(b => b.Contains(keyword, StringComparison.OrdinalIgnoreCase));
-            if (found.Count == 0) Console.WriteLine("  Нічого не знайдено.");
-            else found.ForEach(b => Console.WriteLine($"  Знайдено: {b}"));
+            if (found.Count == 0)
+                Messages.Print("library", "search_not_found");
+            else
+                found.ForEach(b => Messages.Print("library", "search_found", b));
         }
 
         // Records a book borrowing event.
         public void BorrowBook(Student student, string title)
         {
             if (!HasBook(title))
-            { Console.WriteLine($"[Library] Книга '{title}' відсутня в каталозі."); return; }
+            {
+                Messages.Print("library", "borrow_not_found", title);
+                return;
+            }
             _borrowedBooks.Add($"{student.Name}:{title}");
-            Console.WriteLine($"[Library] {student.Name} отримує '{title}'");
+            Messages.Print("library", "borrow_success", student.Name, title);
         }
 
         // Prints a summary of the library catalog and rooms.
         public void GetCatalog()
         {
-            Console.WriteLine($"[Library] Location: {_location}, capacity: {_capacity}");
-            Console.WriteLine($"  Books in catalog: {_catalog.Count}");
-            Console.WriteLine($"  Classrooms managed: {_classrooms.Count}");
+            Messages.Print("library", "catalog_info", _location, _capacity);
+            Messages.Print("library", "catalog_books", _catalog.Count);
+            Messages.Print("library", "catalog_classrooms", _classrooms.Count);
         }
 
         public void PrintInfo()
         {
-            Console.WriteLine($"  Розташування : {_location}");
-            Console.WriteLine($"  Місць        : {_capacity}");
-            Console.WriteLine($"  Відкрита     : {IsOpen}");
-            Console.WriteLine($"  Книг         : {_catalog.Count}");
-            Console.WriteLine($"  Аудиторій    : {_classrooms.Count}");
-            Console.WriteLine($"  Видано книг  : {_borrowedBooks.Count}");
-            Console.WriteLine($"  FullInfo     : {FullInfo}");
+            Console.WriteLine($"  {Messages.Get("library", "location_label")} : {_location}");
+            Console.WriteLine($"  {Messages.Get("library", "capacity_label")}        : {_capacity}");
+            Console.WriteLine($"  {Messages.Get("library", "isopen_label")}     : {IsOpen}");
+            Console.WriteLine($"  {Messages.Get("library", "books_label")}         : {_catalog.Count}");
+            Console.WriteLine($"  {Messages.Get("library", "classrooms_label")}    : {_classrooms.Count}");
+            Console.WriteLine($"  {Messages.Get("library", "borrowed_label")}  : {_borrowedBooks.Count}");
+            Console.WriteLine($"  {Messages.Get("library", "fullinfo_label")}     : {FullInfo}");
         }
 
-        public override string ToString() => $"Library at '{_location}' ({_capacity} seats)";
+        public override string ToString() => Messages.Get("library", "to_string", _location, _capacity);
     }
 }
