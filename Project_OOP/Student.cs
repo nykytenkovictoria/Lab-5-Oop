@@ -13,6 +13,7 @@ namespace DigitalUniversity
         private double _gpa;
         private int _missedClasses;
         private static int _totalStudents;
+        private static List<Student> _allStudents = new();
 
         public int MissedClasses
         {
@@ -74,6 +75,7 @@ namespace DigitalUniversity
             _missedClasses = 0;
             FullInfo = BuildInfo();
             _totalStudents++;
+            _allStudents.Add(this);
         }
 
         public Student(string id, string name, string group, string course) : base(id, name, true)
@@ -84,6 +86,7 @@ namespace DigitalUniversity
             _missedClasses = 0;
             FullInfo = BuildInfo();
             _totalStudents++;
+            _allStudents.Add(this);
         }
 
         // 4. Конструктор що викликає інший конструктор
@@ -104,6 +107,7 @@ namespace DigitalUniversity
             _missedClasses = other._missedClasses;
             FullInfo = BuildInfo();
             _totalStudents++;
+            _allStudents.Add(this);
         }
 
 
@@ -114,6 +118,7 @@ namespace DigitalUniversity
             _course = "—";
             _missedClasses = 0;
             FullInfo = BuildInfo();
+            _allStudents.Add(this);
         }
 
         public static Student CreateSystem(string id) => new Student(id);
@@ -149,6 +154,49 @@ namespace DigitalUniversity
         public void ViewSchedule()
         {
             Messages.Print("student", "view_schedule", _name, _group);
+
+            var enrolledCourses = GetEnrolledCourses();
+
+            if (enrolledCourses.Count == 0)
+            {
+                Messages.Print("student", "schedule_no_courses");
+                return;
+            }
+
+            Messages.Print("student", "schedule_total_courses", enrolledCourses.Count);
+
+            foreach (var course in enrolledCourses)
+            {
+                var teacher = GetCourseTeacher(course);
+                string teacherName = teacher != null ? teacher.Name : Messages.Get("student", "unknown_teacher");
+
+                Messages.Print("student", "schedule_course",
+                    course.CourseId,
+                    course.Title,
+                    teacherName,
+                    course.Credits,
+                    course.IsOnlineCourse() ? "Так" : "Ні");
+            }
+        }
+
+        private List<Course> GetEnrolledCourses()
+        {
+            var allCourses = Course.GetAllCourses();
+            return allCourses.Where(c => c.IsStudentEnrolled(_id)).ToList();
+        }
+
+        private Teacher GetCourseTeacher(Course course)
+        {
+            var allTeachers = Teacher.GetAllTeachers();
+            var teacherId = course.TeacherId;
+            var teacherOfCourse = allTeachers.Where(t => t.Id == teacherId).First();
+            return teacherOfCourse;
+        }
+
+
+        public static List<Student> GetAllStudents()
+        {
+            return _allStudents;
         }
 
         public void CheckStatus()
@@ -211,8 +259,6 @@ namespace DigitalUniversity
         public static bool operator false(Student s) => !s.IsActive;
 
         // Оператори порівняння
-        public static bool operator ==(Student a, Student b) => a._gpa == b._gpa;
-        public static bool operator !=(Student a, Student b) => a._gpa != b._gpa;
         public static bool operator >(Student a, Student b) => a._gpa > b._gpa;
         public static bool operator <(Student a, Student b) => a._gpa < b._gpa;
         public static bool operator >=(Student a, Student b) => a._gpa >= b._gpa;

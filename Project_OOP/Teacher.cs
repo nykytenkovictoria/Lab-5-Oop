@@ -11,6 +11,7 @@ namespace DigitalUniversity
         private int _experienceYears;
         private int _coursesCount;
         private static int _totalTeachers;
+        private static List<Teacher> _allTeachers = new();
 
 
         public string Position
@@ -49,6 +50,7 @@ namespace DigitalUniversity
             Department = Messages.Get("teacher", "default_department");
             FullInfo = BuildInfo();
             _totalTeachers++;
+            _allTeachers.Add(this);
         }
 
         // 3. Конструктор з параметрами
@@ -59,6 +61,7 @@ namespace DigitalUniversity
             Department = Messages.Get("teacher", "default_department");
             FullInfo = BuildInfo();
             _totalTeachers++;
+            _allTeachers.Add(this);
         }
 
         // 4. Конструктор що викликає інший конструктор
@@ -68,6 +71,7 @@ namespace DigitalUniversity
             _experienceYears = experienceYears;
             Department = department;
             FullInfo = BuildInfo();
+            _allTeachers.Add(this);
         }
 
         // 5. Конструктор копії
@@ -78,6 +82,7 @@ namespace DigitalUniversity
             Department = other.Department;
             FullInfo = BuildInfo();
             _totalTeachers++;
+            _allTeachers.Add(this);
         }
 
         // 6. Закритий конструктор
@@ -86,6 +91,7 @@ namespace DigitalUniversity
             _position = Messages.Get("teacher", "default_position");
             Department = Messages.Get("teacher", "default_department");
             FullInfo = BuildInfo();
+            _allTeachers.Add(this);
         }
 
         public static Teacher CreateGuest(string id) => new Teacher(id);
@@ -100,6 +106,12 @@ namespace DigitalUniversity
         public bool CanTakeMoreCourses() => _coursesCount < 5;
 
         /// Чи належить до кафедри
+        /// 
+
+        public static List<Teacher> GetAllTeachers()
+        {
+            return _allTeachers;
+        }
         public bool BelongsToDepartment(string deptName) =>
             Department.Equals(deptName, StringComparison.OrdinalIgnoreCase);
 
@@ -133,6 +145,62 @@ namespace DigitalUniversity
 
         public override bool CanSubmitReport() => IsActive && _coursesCount > 0;
 
+        public void ViewSchedule()
+        {
+            Messages.Print("teacher", "view_schedule", _name, _position);
+
+            var teachingCourses = GetTeachingCourses();
+
+            if (teachingCourses.Count == 0)
+            {
+                Messages.Print("teacher", "schedule_no_courses");
+                return;
+            }
+
+            Messages.Print("teacher", "schedule_header", teachingCourses.Count);
+
+            foreach (var course in teachingCourses)
+            {
+                Messages.Print("teacher", "course_title", course.Title, course.CourseId, course.Credits, course.EnrolledCount);
+
+                var students = GetEnrolledStudents(course);
+
+                if (students.Count > 0)
+                {
+                    foreach (var student in students)
+                    {
+                        if (student != null)
+                            Console.WriteLine(student.FullInfo);
+                    }
+                }
+                else
+                {
+                    Messages.Print("teacher", "no_students");
+                }
+                Console.WriteLine();
+            }
+        }
+
+        private List<Course> GetTeachingCourses()
+        {
+            return Course.GetCoursesByTeacher(_id);
+        }
+
+        private List<Student> GetEnrolledStudents(Course course)
+        {
+            var students = course.GetStudentsId();
+            var allStudents = Student.GetAllStudents();
+            var listStundents = new List<Student>();
+            foreach (var studentId in students)
+            {
+                var student = allStudents.FirstOrDefault(s => s.Id == studentId);
+                if (student != null)
+                    listStundents.Add(student);
+            }
+
+            return listStundents;
+        }
+
         // Submits a report to the system.
         public override void SubmitReport(OnlineReport report)
         {
@@ -151,6 +219,7 @@ namespace DigitalUniversity
                 Messages.Print("teacher", "overloaded_cannot_take", _name, course.Title);
                 return;
             }
+            course.TeacherId = _id;
             _coursesCount++;
             FullInfo = BuildInfo();
             Messages.Print("teacher", "assign_course", _name, course.Title, _coursesCount);
@@ -188,8 +257,6 @@ namespace DigitalUniversity
         }
 
         // Оператори порівняння: порівнюємо по досвіду
-        public static bool operator ==(Teacher a, Teacher b) => a._experienceYears == b._experienceYears;
-        public static bool operator !=(Teacher a, Teacher b) => a._experienceYears != b._experienceYears;
         public static bool operator >(Teacher a, Teacher b) => a._experienceYears > b._experienceYears;
         public static bool operator <(Teacher a, Teacher b) => a._experienceYears < b._experienceYears;
         public static bool operator >=(Teacher a, Teacher b) => a._experienceYears >= b._experienceYears;

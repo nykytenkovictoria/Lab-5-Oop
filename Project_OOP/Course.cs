@@ -11,21 +11,26 @@ namespace DigitalUniversity
         private int _enrolledCount;
         private int _maxCapacity;
         private static int _totalCourses;
+        private List<string> _enrolledStudentIds = new();
+        private static List<Course> _allCourses = new();
+        public string TeacherId { get; set; }
 
         public string Title
         {
             get => _title;
-            set { 
-                if (!string.IsNullOrWhiteSpace(value)) 
-                    _title = value; 
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    _title = value;
             }
         }
         public string CourseId
         {
             get => _courseId;
-            set { 
-                if (!string.IsNullOrWhiteSpace(value)) 
-                    _courseId = value; 
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    _courseId = value;
             }
         }
 
@@ -54,35 +59,34 @@ namespace DigitalUniversity
         static Course()
         {
             _totalCourses = 0;
-            Console.WriteLine("[Course] Статичний конструктор: клас ініціалізовано.");
         }
 
         // 2. Конструктор без параметрів
         public Course()
         {
-            _courseId = "C-000"; 
-            _title = "Без назви"; 
+            _courseId = Messages.Get("course", "default_id");
+            _title = Messages.Get("course", "default_title");
             _credits = 1;
             _enrolledCount = 0;
             _maxCapacity = 30;
             IsOnline = false;
             FullInfo = BuildInfo();
             _totalCourses++;
-            Console.WriteLine($"[Course] Конструктор без параметрів: створено '{_title}'");
+            _allCourses.Add(this);
         }
 
         // 3. Конструктор з параметрами
         public Course(string courseId, string title, int credits)
         {
-            _courseId = courseId; 
-            _title = title; 
+            _courseId = courseId;
+            _title = title;
             _credits = credits;
             _enrolledCount = 0;
             _maxCapacity = 30;
             IsOnline = false;
             FullInfo = BuildInfo();
             _totalCourses++;
-            Console.WriteLine($"[Course] Конструктор з параметрами: '{_title}', {_credits} кредити");
+            _allCourses.Add(this);
         }
 
         // 4. Конструктор що викликає інший конструктор
@@ -91,7 +95,6 @@ namespace DigitalUniversity
         {
             IsOnline = isOnline;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Course] Конструктор виклику іншого: онлайн={IsOnline}");
         }
 
         // 5. Конструктор копії
@@ -105,24 +108,24 @@ namespace DigitalUniversity
             _enrolledCount = 0;
             FullInfo = BuildInfo();
             _totalCourses++;
-            Console.WriteLine($"[Course] Конструктор копії: скопійовано '{_title}'");
+            _allCourses.Add(this);
         }
 
         // 6. Закритий конструктор
         private Course(string courseId)
         {
             _courseId = courseId;
-            _title = "Архівний курс";
+            _title = Messages.Get("course", "archived_title");
             _credits = 0;
             IsOnline = false;
             FullInfo = BuildInfo();
-            Console.WriteLine($"[Course] Закритий конструктор: архівний [{_courseId}]");
+            _allCourses.Add(this);
         }
 
         public static Course CreateArchived(string id) => new Course(id);
 
         private string BuildInfo() =>
-            $"[{_courseId}] {_title} | Кредити: {_credits} | Онлайн: {IsOnline} | Зараховано: {_enrolledCount}/{_maxCapacity}";
+            Messages.Get("course", "build_info", _courseId, _title, _credits, IsOnline, _enrolledCount, _maxCapacity);
 
         public bool HasAvailableSpots() => _enrolledCount < _maxCapacity;
 
@@ -134,22 +137,52 @@ namespace DigitalUniversity
 
         public bool IsIntensive() => _credits > 4;
 
+        public bool IsStudentEnrolled(string studentId)
+        {
+            return _enrolledStudentIds.Contains(studentId);
+        }
+        
+        public List<string> GetStudentsId()
+        {
+            return _enrolledStudentIds;
+        }
+
 
         /// Enrols a student in this course.
         public void Enroll(Student student)
         {
             if (IsFull())
-            { Console.WriteLine($"[Course] '{_title}': немає місць для {student.Name}"); return; }
-            _enrolledCount++;
-            FullInfo = BuildInfo();
-            Console.WriteLine($"[Course] '{_title}':" +
-                $" зараховано {student.Name}. Місць зайнято: {_enrolledCount}/{_maxCapacity}");
+            {
+                Messages.Print("course", "enroll_no_spots", _title, student.Name);
+                return;
+            }
+            if (!_enrolledStudentIds.Contains(student.Id))
+            {
+                _enrolledStudentIds.Add(student.Id);
+                _enrolledCount = _enrolledStudentIds.Count;
+                FullInfo = BuildInfo();
+                Messages.Print("course", "enroll_success",
+                    _title, student.Name,
+                    _enrolledCount,
+                    _maxCapacity);
+            }
+        }
+
+
+        public static List<Course> GetAllCourses()
+        {
+            return _allCourses;
+        }
+
+        public static List<Course> GetCoursesByTeacher(string teacherId)
+        {
+            return _allCourses.Where(c => c.TeacherId == teacherId).ToList();
         }
 
         /// Returns a list of available materials (stub).
         public void GetMaterials()
         {
-            Console.WriteLine($"[Course] '{_title}': loading course materials ({_credits} credits)...");
+            Messages.Print("course", "get_materials", _title, _credits);
         }
 
         /// Displays course summary information.
@@ -161,42 +194,42 @@ namespace DigitalUniversity
 
         public void PrintEnrollmentStatus()
         {
-            Console.WriteLine($"[Course] '{_title}' — стан запису:");
-            Console.WriteLine($"  Зараховано    : {_enrolledCount}/{_maxCapacity}");
-            Console.WriteLine($"  Є місця       : {HasAvailableSpots()}");
-            Console.WriteLine($"  Заповнений    : {IsFull()}");
-            Console.WriteLine($"  Активний      : {IsActive()}");
-            Console.WriteLine($"  Онлайн        : {IsOnlineCourse()}");
-            Console.WriteLine($"  Інтенсивний   : {IsIntensive()}");
+            Messages.Print("course", "enrollment_status_header", _title);
+            Messages.Print("course", "enrollment_enrolled", _enrolledCount, _maxCapacity);
+            Messages.Print("course", "enrollment_has_spots", HasAvailableSpots());
+            Messages.Print("course", "enrollment_is_full", IsFull());
+            Messages.Print("course", "enrollment_is_active", IsActive());
+            Messages.Print("course", "enrollment_is_online", IsOnlineCourse());
+            Messages.Print("course", "enrollment_is_intensive", IsIntensive());
         }
 
         public void PrintInfo()
         {
-            Console.WriteLine($"  ID курсу     : {_courseId}");
-            Console.WriteLine($"  Назва        : {_title}");
-            Console.WriteLine($"  Кредити      : {_credits}");
-            Console.WriteLine($"  Онлайн       : {IsOnline}");
-            Console.WriteLine($"  Зараховано   : {_enrolledCount}");
-            Console.WriteLine($"  FullInfo     : {FullInfo}");
-            Console.WriteLine($"  Всього курсів: {TotalCourses}");
+            Console.WriteLine($"  {Messages.Get("course", "id_label")}     : {_courseId}");
+            Console.WriteLine($"  {Messages.Get("course", "title_label")}        : {_title}");
+            Console.WriteLine($"  {Messages.Get("course", "credits_label")}      : {_credits}");
+            Console.WriteLine($"  {Messages.Get("course", "online_label")}       : {IsOnline}");
+            Console.WriteLine($"  {Messages.Get("course", "enrolled_label")}   : {_enrolledCount}");
+            Console.WriteLine($"  {Messages.Get("course", "fullinfo_label")}     : {FullInfo}");
+            Console.WriteLine($"  {Messages.Get("course", "total_courses_label")}: {TotalCourses}");
         }
 
 
-        public override string ToString() => $"Course [{_courseId}] '{_title}' ({_credits} cr.)";
+        public override string ToString() => Messages.Get("course", "to_string", _courseId, _title, _credits);
 
         // Унарний ++  : підвищити credits на 1 
         public static Course operator ++(Course c)
         {
             c._credits += 1;
-            Console.WriteLine($"[Course op++] {c.Title}: credits підвищено до {c._credits}");
+            Messages.Print("course", "op_increment", c.Title, c._credits);
             return c;
         }
 
         // Унарний --  : знизити credits на 1 
         public static Course operator --(Course c)
         {
-            c._credits += 1;
-            Console.WriteLine($"[Course op--] {c.Title}: credits знижено до {c._credits}");
+            c._credits -= 1;
+            Messages.Print("course", "op_decrement", c.Title, c._credits);
             return c;
         }
 
@@ -211,17 +244,13 @@ namespace DigitalUniversity
                 a._title + " + " + b._title,
                 a._credits + b._credits
             );
-            Console.WriteLine($"[Course op+] Об'єднано курси: '{result.Title}', кредитів={result.Credits}");
+            Messages.Print("course", "op_plus", result.Title, result.Credits);
             return result;
         }
 
         // Оператори порівняння: порівнюємо по кількості кредитів
         public static bool operator ==(Course a, Course b) => a._credits == b._credits;
         public static bool operator !=(Course a, Course b) => a._credits != b._credits;
-        public static bool operator >(Course a, Course b) => a._credits > b._credits;
-        public static bool operator <(Course a, Course b) => a._credits < b._credits;
-        public static bool operator >=(Course a, Course b) => a._credits >= b._credits;
-        public static bool operator <=(Course a, Course b) => a._credits <= b._credits;
 
         public override bool Equals(object? obj) => obj is Course c && _credits == c._credits;
 
