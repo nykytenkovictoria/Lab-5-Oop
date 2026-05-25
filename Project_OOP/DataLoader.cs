@@ -14,7 +14,7 @@ namespace DigitalUniversity
         {
             if (!File.Exists(path))
             {
-                Console.WriteLine($"Файл не знайдено: {path}");
+                Messages.Print("dataloader", "file_not_found", path);
                 yield break;
             }
 
@@ -44,7 +44,9 @@ namespace DigitalUniversity
                    missedClasses: int.TryParse(f[6], out var missed) ? missed : 0
                     );
                     list.Add(s);
-                    Console.WriteLine($"Студент завантажений: {s.Name} ({s.Group})");
+                    Messages.Print("dataloader",
+                        "student_loaded_full",
+                        s.Name, s.Group);
                 }
                 else if (f.Length == 5)
                 {
@@ -54,9 +56,11 @@ namespace DigitalUniversity
                         group: f[3],
                         course: f[4]);
                     list.Add(s);
-                    Console.WriteLine($"Студент завантажений: {s.Name} ({s.Group})");
+                    Messages.Print("dataloader",
+                        "student_loaded_basic",
+                        s.Name, s.Group);
                 }
-               
+
             }
             return list;
         }
@@ -67,7 +71,8 @@ namespace DigitalUniversity
             var list = new List<Teacher>();
             foreach (var f in ReadLines(path))
             {
-                if (f.Length >= 6) {
+                if (f.Length >= 6)
+                {
                     var t = new Teacher(
                         id: f[0],
                         name: $"{f[1]} {f[2]}",
@@ -76,7 +81,9 @@ namespace DigitalUniversity
                         department: f[5]
                     );
                     list.Add(t);
-                    Console.WriteLine($"Викладач завантажений: {t.Name} ({t.Position})");
+                    Messages.Print("dataloader",
+                        "teacher_loaded_full",
+                        t.Name, t.Position);
                 }
                 else if (f.Length == 4)
                 {
@@ -85,9 +92,11 @@ namespace DigitalUniversity
                         name: $"{f[1]} {f[2]}",
                         position: f[3]);
                     list.Add(t);
-                    Console.WriteLine($"Викладач завантажений: {t.Name} ({t.Position})");
+                    Messages.Print("dataloader",
+                        "teacher_loaded_basic",
+                        t.Name, t.Position);
                 }
-                
+
             }
             return list;
         }
@@ -107,7 +116,9 @@ namespace DigitalUniversity
                         isOnline: bool.TryParse(f[3], out var o) && o
                     );
                     list.Add(c);
-                    Console.WriteLine($"Курс завантажений: {c.Title} ({c.Credits} кр.)");
+                    Messages.Print("dataloader", 
+                        "course_loaded_full",
+                        c.Title, c.Credits);
                 }
                 else if (f.Length == 3)
                 {
@@ -117,7 +128,9 @@ namespace DigitalUniversity
                         credits: int.TryParse(f[2], out var cr) ? cr : 1
                     );
                     list.Add(c);
-                    Console.WriteLine($"Курс завантажений: {c.Title} ({c.Credits} кр.)");
+                    Messages.Print("dataloader",
+                        "course_loaded_basic",
+                        c.Title, c.Credits);
                 }
             }
             return list;
@@ -134,13 +147,17 @@ namespace DigitalUniversity
                 {
                     var d = new Department(f[0], f[1], f[2]);
                     list.Add(d);
-                    Console.WriteLine($"Кафедра завантажена: {d.Name} (Декан: {d.Dean})");
+                    Messages.Print("dataloader",
+                        "department_loaded_full",
+                        d.Name, d.Dean);
                 }
                 else if (f.Length == 2)
                 {
                     var d = new Department(f[0], f[1]);
                     list.Add(d);
-                    Console.WriteLine($"Кафедра завантажена: {d.Name} (Декан: {d.Dean})");
+                    Messages.Print("dataloader",
+                        "department_loaded_basic",
+                        d.Name, d.Dean);
                 }
             }
             return list;
@@ -152,23 +169,28 @@ namespace DigitalUniversity
             var list = new List<Decanat>();
             foreach (var f in ReadLines(path))
             {
-                if (f.Length >= 3) { 
-                var d = new Decanat(
-                    faculty: f[0],
-                    headName: f[1],
-                    isActive: bool.TryParse(f[2], out var a) && a
-                );
-                list.Add(d);
-                Console.WriteLine($"Деканат завантажений: {d.Faculty} (Керівник: {d.HeadName})");
+                if (f.Length >= 3)
+                {
+                    var d = new Decanat(
+                        faculty: f[0],
+                        headName: f[1],
+                        isActive: bool.TryParse(f[2], out var a) && a
+                    );
+                    list.Add(d);
+                    Messages.Print("dataloader",
+                        "decanat_loaded_full",
+                        d.Faculty, d.HeadName);
                 }
-                else if ( f.Length == 2)
+                else if (f.Length == 2)
                 {
                     var d = new Decanat(
                     faculty: f[0],
                     headName: f[1]
                 );
                     list.Add(d);
-                    Console.WriteLine($"Деканат завантажений: {d.Faculty} (Керівник: {d.HeadName})");
+                    Messages.Print("dataloader",
+                        "decanat_loaded_basic",
+                        d.Faculty, d.HeadName);
                 }
             }
             return list;
@@ -188,16 +210,20 @@ namespace DigitalUniversity
                         location: f[2]
                     );
                     list.Add(r);
-                    Console.WriteLine($"Аудиторія завантажена: {r.RoomNumber} ({r.Capacity} місць, {r.Location})");
+                    Messages.Print("dataloader",
+                        "classroom_loaded_full",
+                        r.RoomNumber, r.Capacity, r.Location);
                 }
-                else if (f.Length == 2) 
+                else if (f.Length == 2)
                 {
                     var r = new Classroom(
                         roomNumber: f[0],
                         capacity: int.TryParse(f[1], out var cap) ? cap : 0
                     );
                     list.Add(r);
-                    Console.WriteLine($"Аудиторія завантажена: {r.RoomNumber} ({r.Capacity} місць, {r.Location})");
+                    Messages.Print("dataloader", 
+                        "classroom_loaded_basic",
+                        r.RoomNumber, r.Capacity, r.Location);
                 }
             }
             return list;
@@ -214,6 +240,9 @@ namespace DigitalUniversity
                     var library = new Library(
                         location: f[0],
                         capacity: int.TryParse(f[1], out var cap) ? cap : 0);
+                    Messages.Print("dataloader", 
+                        "library_loaded_basic",
+                        library.Location, library.Capacity);
                     return library;
                 }
                 else if (f.Length >= 3)
@@ -222,6 +251,9 @@ namespace DigitalUniversity
                         location: f[0],
                         capacity: int.TryParse(f[1], out var cap) ? cap : 0,
                         isOpen: bool.TryParse(f[2], out var isOpen) ? isOpen : false);
+                    Messages.Print("dataloader", 
+                        "library_loaded_full", 
+                        library.Location, library.Capacity, library.IsOpen);
                     return library;
                 }
             }
@@ -235,10 +267,13 @@ namespace DigitalUniversity
                 if (f.Length < 1) continue;
                 var bookName = f[0];
                 library.AddBook(bookName);
-                Console.WriteLine($"Book added to {library.Location}, book title {bookName}");
+                Messages.Print(
+                    "dataloader", 
+                    "book_added", 
+                    bookName,
+                    library.Location
+                    );
             }
         }
     }
-
-   
 }

@@ -41,14 +41,13 @@ class Program
         LoadAllData();
         BuildUniversity();
         EnrollStudents();
-        ShowStudentPredicates();
-        ShowTeacherPredicates();
-        ShowCoursePredicates();
+        ShowStudent();
+        ShowTeacher();
+        ShowCourse();
         ShowDepartmentReports();
         ShowLibrary();
         ShowDecanat();
         ShowOnlineReport();
-        ShowOperators();
         PrintSummary();
 
         PrintFooter();
@@ -59,7 +58,7 @@ class Program
         Console.WriteLine("Курс         : 1");
         Console.WriteLine("Група        : IPZ-12");
         Console.WriteLine("Варіант      : Цифровий університет");
-        Console.WriteLine("Версія       : 4.0");
+        Console.WriteLine("Версія       : 6.0");
         Console.WriteLine();
     }
 
@@ -165,7 +164,7 @@ class Program
 
     static void EnrollStudents()
     {
-        Console.WriteLine("\n=== Запис студентів на курси ===\n");
+        Console.WriteLine("\n=== Запис студентів на курси Перегляд розкладу ===\n");
 
         var oop = courses.Find(c => c.CourseId == "CS101");
         var db = courses.Find(c => c.CourseId == "CS102");
@@ -174,44 +173,46 @@ class Program
             foreach (var s in students) oop.Enroll(s);
 
         if (db)
-            foreach (var s in students.FindAll(s => s.Group == "ІПЗ-21")) db.Enroll(s);
+            foreach (var s in students.FindAll(s => s.Group == "ІПЗ-21")) 
+                db.Enroll(s);
 
         if (teachers.Count > 0)
             if (oop)
             {
+                
                 teachers[0].AssignCourse(oop);
+                teachers[0].ViewSchedule();
+                teachers[1].AssignCourse(db);
+                teachers[1].ViewSchedule();
             }
-
+        foreach (var s in students.FindAll(s => s.Group == "ІПЗ-21"))
+            s.ViewSchedule();
     }
 
-    static void ShowStudentPredicates()
+    static void ShowStudent()
     {
-        Console.WriteLine("\n=== Предикати — статус студентів ===\n");
+        Console.WriteLine("\n=== Онлайн кабінет студентів ===\n");
         foreach (var s in students)
         {
             s.ViewCabinet();
         }
     }
 
-    static void ShowTeacherPredicates()
+    static void ShowTeacher()
     {
-        Console.WriteLine("\n=== Предикати — статус викладачів ===\n");
+        Console.WriteLine("\n=== Онлайн кабінет викладачів ===\n");
         foreach (var t in teachers)
         {
             t.ViewCabinet();
         }
     }
 
-    static void ShowCoursePredicates()
+    static void ShowCourse()
     {
-        Console.WriteLine("\n=== Предикати — курси ===\n");
+        Console.WriteLine("\n=== Курси ===\n");
         foreach (var c in courses)
         {
-            Console.WriteLine($"  [{c.Title}]");
-            Console.WriteLine($"    Активний      : {c.IsActive()}");
-            Console.WriteLine($"    Є місця       : {c.HasAvailableSpots()}");
-            Console.WriteLine($"    Онлайн        : {c.IsOnlineCourse()}");
-            Console.WriteLine($"    Інтенсивний   : {c.IsIntensive()}");
+            c.PrintInfo();
         }
     }
 
@@ -279,83 +280,6 @@ class Program
     {
         Console.WriteLine("\n=== Підсумок університету ===\n");
         dept.GetInfo();
-    }
-
-
-    static void ShowOperators()
-    {
-        Console.WriteLine("\n=== Перевантаження операторів ===\n");
-
-        // ── Student operators ─────────────────────────────────
-        Console.WriteLine("  -- Student --");
-        var sA = students[0];
-        var sB = students[1];
-
-        // Бінарний -  : різниця GPA
-        double gpaDiff = sA - sB;
-
-        // Унарний ++ / --
-        sA++;
-        sB--;
-
-        // Унарний !
-        Console.WriteLine($"  !sA (не відмінник): {!sA}");
-        Console.WriteLine($"  !sB (не відмінник): {!sB}");
-
-        // true / false
-        Console.WriteLine($"  {sA.Name} активний (if sA): {(sA ? "так" : "ні")}");
-
-        // Порівняння
-        Console.WriteLine($"  sA > sB  (GPA): {sA > sB}");
-        Console.WriteLine($"  sA < sB  (GPA): {sA < sB}");
-        Console.WriteLine($"  sA == sB (GPA): {sA == sB}");
-        Console.WriteLine($"  sA != sB (GPA): {sA != sB}");
-
-        // ── Teacher operators ─────────────────────────────────
-        Console.WriteLine("\n  -- Teacher --");
-        var tA = teachers[0];
-        var tB = teachers[1];
-
-        // Унарний ++
-        tA++;
-        Console.WriteLine($"  tA після ++: досвід={tA.ExperienceYears} р.");
-
-        // Порівняння
-        Console.WriteLine($"  tA > tB  (досвід): {tA > tB}");
-        Console.WriteLine($"  tA < tB  (досвід): {tA < tB}");
-        Console.WriteLine($"  tA == tB (досвід): {tA == tB}");
-
-        // ── Course operators ──────────────────────────────────
-        Console.WriteLine("\n  -- Course --");
-        var cA = courses[0];
-        var cB = courses[1];
-
-        // Унарний ++
-        cA++;
-        cB--; 
-        Console.WriteLine($"після ++: '{cA.Title}', кредитів={cA.Credits}");
-        Console.WriteLine($"після --: '{cB.Title}', кредитів={cB.Credits}");
-        // Бінарний +
-        var cMerged = cA + cB;
-        Console.WriteLine($"  Об'єднаний курс: '{cMerged.Title}', кредитів={cMerged.Credits}");
-
-        // Порівняння
-        Console.WriteLine($"  cA > cB  (кредити): {cA > cB}");
-        Console.WriteLine($"  cA == cB (кредити): {cA == cB}");
-        Console.WriteLine($"  cA >= cB (кредити): {cA >= cB}");
-
-        // ── Classroom operators ───────────────────────────────
-        Console.WriteLine("\n  -- Classroom --");
-        var rA = classrooms[0];
-        var rB = classrooms[1];
-        // Бінарний +
-        var rMerged = rA + rB;
-        Console.WriteLine($"  Об'єднана аудиторія: {rMerged.RoomNumber}, місць={rMerged.Capacity}");
-
-        // Порівняння
-        Console.WriteLine($"  rA < rB  (місця): {rA < rB}");
-        Console.WriteLine($"  rA == rB (місця): {rA == rB}");
-        Console.WriteLine($"  rB >= rA (місця): {rB >= rA}");
     }
 
 }
