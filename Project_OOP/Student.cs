@@ -175,7 +175,9 @@ namespace DigitalUniversity
                     course.Title,
                     teacherName,
                     course.Credits,
-                    course.IsOnlineCourse() ? "Так" : "Ні");
+                    course.IsOnlineCourse() ? "Так" : "Ні",
+                    course.ClassRoom
+                    );
             }
         }
 

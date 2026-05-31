@@ -32,7 +32,7 @@
     "view_schedule": "[Студент] {0} переглядає розклад (група {1}):",
     "schedule_no_courses": "  (немає зарахованих курсів)",
     "schedule_total_courses": "  Всього курсів: {0}",
-    "schedule_course": "  • {0} | {1} | Викладач: {2} | {3} кр.",
+    "schedule_course": "  • {0} | {1} | Викладач: {2} | {3} кр. | Online - {4} | Ayд {5}",
     "student_item": "     - {0} | GPA: {1:F1} | {2}",
     "unknown_teacher": "Невідомий"
   },
@@ -70,7 +70,7 @@
     "view_schedule": "[Teacher] {0} ({1}) переглядає розклад:",
     "schedule_header": "  Викладає курсів: {0}",
     "schedule_no_courses": "  (немає призначених курсів)",
-    "course_title": " {0} [{1}] | {2} кр. | Студентів: {3}",
+    "course_title": " {0} [{1}] | {2} кр. | Студентів: {3} | Online - {4} | Ayд {5}",
     "no_students": " Немає студентів"
   },
   "course": {
@@ -107,6 +107,8 @@
     "reserve_name": "Резерв",
     "build_info": "Ауд.{0} | Місць: {1} | Місце: {2} | Зайнята: {3}",
     "book_already_taken": "[Classroom] Ауд.{0} вже зайнята ({1}).",
+    "cant_fit": "[Classroom] Ауд не може вмістити {0} макс кількість {1}",
+    "online_course": "[Classroom] Курс {0} онлайн для нього не треба аудіторія",
     "book_success": "[Classroom] Ауд.{0} заброньована: {1}",
     "release": "[Classroom] Ауд.{0} звільнена.",
     "get_schedule": "[Classroom] Ауд.{0}: місць={1}, зайнята={2}",
@@ -115,6 +117,8 @@
     "room_label": "Аудиторія",
     "capacity_label": "Місць",
     "location_label": "Корпус",
+    "booked_course": "Дисциплина",
+    "booked_teacher": "Вчитель",
     "booked_label": "Зайнята",
     "fullinfo_label": "FullInfo",
     "total_rooms_label": "Всього ауд.",

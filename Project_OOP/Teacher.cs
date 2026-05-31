@@ -161,7 +161,13 @@ namespace DigitalUniversity
 
             foreach (var course in teachingCourses)
             {
-                Messages.Print("teacher", "course_title", course.Title, course.CourseId, course.Credits, course.EnrolledCount);
+                Messages.Print("teacher", "course_title",
+                    course.Title,
+                    course.CourseId, 
+                    course.Credits,
+                    course.EnrolledCount,
+                    course.IsOnlineCourse() ? "Так" : "Ні",
+                    course.ClassRoom);
 
                 var students = GetEnrolledStudents(course);
 

@@ -181,8 +181,15 @@ class Program
             {
                 
                 teachers[0].AssignCourse(oop);
+                classrooms[2].Book(teachers[0], oop);
+                Console.WriteLine(classrooms[2].BookedBy);
                 teachers[0].ViewSchedule();
+              
+            }
+            if (db)
+            {
                 teachers[1].AssignCourse(db);
+                classrooms[1].Book(teachers[1], db);
                 teachers[1].ViewSchedule();
             }
         foreach (var s in students.FindAll(s => s.Group == "ІПЗ-21"))
@@ -237,7 +244,6 @@ class Program
         var oop = courses.Find(c => c.CourseId == "CS101");
         if (classrooms.Count > 0 && teachers.Count > 0)
         {
-            classrooms[0].Book(teachers[0], oop);
             classrooms[0].GetSchedule();
         }
 

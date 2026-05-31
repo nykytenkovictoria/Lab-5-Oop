@@ -8,6 +8,7 @@ namespace DigitalUniversity
         private string _roomNumber;
         private bool _isBooked;
         private string _bookedBy;
+        private string _courseId;
         private static int _totalRooms;
 
         public string RoomNumber
@@ -22,6 +23,10 @@ namespace DigitalUniversity
 
 
         public bool IsBooked => _isBooked;
+
+        public string BookedBy => _bookedBy;
+
+        public string BookedByCourse => _courseId;
 
         public static int TotalRooms => _totalRooms;
 
@@ -90,8 +95,21 @@ namespace DigitalUniversity
                 Messages.Print("classroom", "book_already_taken", _roomNumber, _bookedBy);
                 return;
             }
+            int allPeople = course.EnrolledCount;
+            if (!CanFitGroup(allPeople))
+            {
+                Messages.Print("classroom", "cant_fit", allPeople, _capacity);
+                return;
+            }
+            if (course.IsOnline)
+            {
+                Messages.Print("classroom", "online_course", course.Title);
+                return;
+            }
             _isBooked = true;
-            _bookedBy = $"{teacher.Name} / {course.Title}";
+            _bookedBy = $"{teacher.Id}";
+            _courseId = $"{course.CourseId}";
+            course.ClassRoom = $"{_roomNumber}";
             FullInfo = BuildInfo();
             Messages.Print("classroom", "book_success", _roomNumber, _bookedBy);
         }
@@ -100,6 +118,7 @@ namespace DigitalUniversity
         {
             _isBooked = false;
             _bookedBy = "";
+            _courseId = "";
             FullInfo = BuildInfo();
             Messages.Print("classroom", "release", _roomNumber);
         }
@@ -109,7 +128,10 @@ namespace DigitalUniversity
         {
             Messages.Print("classroom", "get_schedule", _roomNumber, _capacity, _isBooked);
             if (_isBooked)
+            {
                 Messages.Print("classroom", "booked_by", _bookedBy);
+                Messages.Print("classroom", "booked_course", _courseId);
+            }
         }
 
         /// Displays room information.
@@ -126,6 +148,8 @@ namespace DigitalUniversity
             Console.WriteLine($"  {Messages.Get("classroom", "capacity_label")}        : {_capacity}");
             Console.WriteLine($"  {Messages.Get("classroom", "location_label")}       : {_location}");
             Console.WriteLine($"  {Messages.Get("classroom", "booked_label")}      : {_isBooked}");
+            Console.WriteLine($"  {Messages.Get("classroom", "booked_course")}      : {_courseId}");
+            Console.WriteLine($"  {Messages.Get("classroom", "booked_teacher")}      : {_bookedBy}");
             Console.WriteLine($"  {Messages.Get("classroom", "fullinfo_label")}     : {FullInfo}");
             Console.WriteLine($"  {Messages.Get("classroom", "total_rooms_label")}  : {TotalRooms}");
         }

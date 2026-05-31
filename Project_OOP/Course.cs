@@ -11,6 +11,7 @@ namespace DigitalUniversity
         private int _enrolledCount;
         private int _maxCapacity;
         private static int _totalCourses;
+        private string _classroom = "";
         private List<string> _enrolledStudentIds = new();
         private static List<Course> _allCourses = new();
         public string TeacherId { get; set; }
@@ -24,6 +25,16 @@ namespace DigitalUniversity
                     _title = value;
             }
         }
+
+        public string ClassRoom {
+            get => _classroom;
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    _classroom = value;
+            }
+        }
+        
         public string CourseId
         {
             get => _courseId;
