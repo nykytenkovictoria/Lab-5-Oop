@@ -1,7 +1,7 @@
 ﻿
 // Program.cs
 // Digital University Platform Simulation
-// Version 4.0
+// Version 6.0
 using DigitalUniversity;
 
 class Program
@@ -49,7 +49,7 @@ class Program
         ShowDecanat();
         ShowOnlineReport();
         PrintSummary();
-
+        ShowMenu();
         PrintFooter();
     }
     static void PrintStudentInfo()
@@ -280,6 +280,12 @@ class Program
 
         report.Archive();
         Console.WriteLine($"  IsClosed   : {report.IsClosed()}");
+    }
+
+    static void ShowMenu()
+    {
+        Console.WriteLine("  Завантаження завершено. Запускаємо інтерактивне меню...");
+        Menu.Run(students, teachers, courses, classrooms, library, dept, decanat);
     }
 
     static void PrintSummary()
