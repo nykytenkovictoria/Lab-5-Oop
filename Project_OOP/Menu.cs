@@ -47,6 +47,9 @@ static class Menu
                 case "10": AddBook(); break;
                 case "11": OnlineReportMenu(); break;
                 case "12": CourseStatistics(); break;
+                case "13": DecanatProcessRequest(); break;
+                case "14": DecanatGenerateReport(); break;
+                case "15": DecanatManageStudents(); break;
                 case "0":
                     Messages.Print("menu", "exit");
                     return;
@@ -75,6 +78,9 @@ static class Menu
         Console.WriteLine(" 10 - " + Messages.Get("menu", "add_book"));
         Console.WriteLine(" 11 - " + Messages.Get("menu", "online_report"));
         Console.WriteLine(" 12 - " + Messages.Get("menu", "course_stats"));
+        Console.WriteLine(" 13 - " + Messages.Get("menu", "decanat_process"));
+        Console.WriteLine(" 14 - " + Messages.Get("menu", "decanat_report"));
+        Console.WriteLine(" 15 - " + Messages.Get("menu", "decanat_students"));
         Console.WriteLine("  0 - " + Messages.Get("menu", "exit_menu"));
         Console.WriteLine("================================================");
         Console.Write($"  {Messages.Get("menu", "choice")}: ");
@@ -305,6 +311,47 @@ static class Menu
 
         c.PrintInfo();
         c.PrintEnrollmentStatus();
+    }
+
+    static void DecanatGenerateReport()
+    {
+        Title(Messages.Get("menu", "decanat_process"));
+        _decanat.GenerateReport();
+    }
+
+    static void DecanatProcessRequest()
+    {
+        Title(Messages.Get("menu", "decanat_report"));
+        if (!HasStudents()) return;
+
+        ListStudents();
+        int si = PickIndex(Messages.Get("menu", "pick_student"), _students.Count);
+        string requestType = Ask(Messages.Get("menu", "exapmle_report"));
+
+        _decanat.ProcessRequest(_students[si], requestType);
+    }
+
+    static void DecanatManageStudents()
+    {
+        Title(Messages.Get("menu", "decanat_process"));
+        _decanat.ManageStudents();
+
+        Console.WriteLine();
+        Console.WriteLine(Messages.Get("menu", "search_student"));
+        ListStudents();
+        int si = PickIndex(Messages.Get("menu", "pick_student"), _students.Count);
+        string id = _students[si].Id;
+        if (!string.IsNullOrEmpty(id))
+        {
+            bool found = _decanat.HasStudent(id);
+            if (found)
+            {
+                var s = _students.Find(s => s.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
+                s?.CheckStatus();
+            }
+            else
+                Messages.Print("decanat", "not_found", id);
+        }
     }
 
     static void Title(string t)
